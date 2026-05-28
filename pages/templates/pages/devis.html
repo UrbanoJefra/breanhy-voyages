@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breavy Voyages | Demande de devis</title>
+<meta name="description" content="Obtenez un devis personnalisé pour votre voyage sur mesure. Famille, couple, lune de miel, groupe ou business — nous créons votre voyage parfait.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold: #C8A951;
+  --gold-light: #E2C97E;
+  --gold-dim: rgba(200,169,81,0.15);
+  --gold-border: rgba(200,169,81,0.25);
+  --navy: #111D33;
+  --navy-mid: #1B2A4A;
+  --navy-light: #243558;
+  --navy-dark: #0D1726;
+  --white: #FFFFFF;
+  --white-80: rgba(255,255,255,0.8);
+  --white-60: rgba(255,255,255,0.6);
+  --white-30: rgba(255,255,255,0.3);
+  --white-10: rgba(255,255,255,0.08);
+  --danger: #E05757;
+  --success: #4CAF82;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+
+/* ═══ CURSEUR ═══ */
+#bv-cursor { position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:difference; }
+#bv-cursor-ring { position:fixed;width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:all .12s cubic-bezier(.25,.46,.45,.94);opacity:0.6; }
+#bv-cursor.hover { width:20px;height:20px; }
+#bv-cursor-ring.hover { width:54px;height:54px;opacity:0.3; }
+
+body { margin:0;padding:0;background:var(--navy-dark);font-family:'Raleway',sans-serif;overflow-x:hidden;padding-top:72px; }
+
+/* ═══ HEADER ═══ */
+.site-header { position:fixed;top:0;left:0;right:0;height:72px;z-index:1000;background:#111D33;transition:background .35s,box-shadow .35s,height .35s; }
+.site-header.is-scrolled { height:64px;box-shadow:0 2px 30px rgba(0,0,0,.4);background:#0D1726; }
+.header-inner { max-width:1200px;margin:auto;padding:0 2.5rem;height:100%;display:flex;align-items:center;justify-content:space-between;gap:32px; }
+.header-logo { display:flex;align-items:center;gap:10px;text-decoration:none; }
+.logo-box { width:46px;height:46px;border:1.5px solid rgba(200,169,81,0.5);border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(200,169,81,0.08);flex-shrink:0; }
+.logo-b { font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:#C8A951;line-height:1; }
+.logo-star { font-size:0.42rem;color:#C8A951;margin-top:1px;letter-spacing:1px; }
+.logo-text { display:flex;flex-direction:column; }
+.logo-main { font-family:'Raleway',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#FFFFFF; }
+.logo-sub { font-size:0.46rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:1px; }
+.header-nav { display:flex;align-items:center;gap:2rem; }
+.nav-link { font-size:.78rem;letter-spacing:.1em;color:rgba(255,255,255,0.85);font-weight:600;position:relative;padding-bottom:4px;transition:color .2s;text-decoration:none; }
+.nav-link::after { content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--gold);transition:width .3s; }
+.nav-link:hover { color:#fff; }
+.nav-link:hover::after,.nav-link.active::after { width:100%; }
+.nav-link.active { color:#fff; }
+.hamburger { display:none;flex-direction:column;gap:5px;cursor:none;padding:4px;background:none;border:none;flex-shrink:0; }
+.hamburger span { display:block;width:24px;height:1.5px;background:rgba(255,255,255,0.85);transition:transform .3s,opacity .3s; }
+.hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+.mobile-menu { position:fixed;top:72px;left:0;right:0;background:#111D33;border-top:1px solid rgba(200,169,81,0.2);max-height:0;overflow:hidden;transition:max-height .4s;z-index:99; }
+.mobile-menu.open { max-height:300px;padding:24px 0; }
+.mobile-nav { width:min(1100px,90%);margin:auto;display:flex;flex-direction:column; }
+.mobile-nav-link { font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.85);font-weight:600;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-decoration:none;display:block;transition:color .2s,padding-left .2s; }
+.mobile-nav-link:hover { color:var(--gold);padding-left:8px; }
+
+/* ═══ HERO DEVIS ═══ */
+.dv-hero { background:var(--navy);position:relative;padding:5rem 2rem 4rem;text-align:center;overflow:hidden; }
+.dv-hero::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 100%,rgba(200,169,81,0.1),transparent);pointer-events:none; }
+.dv-hero::after { content:'';position:absolute;top:-50%;left:-20%;width:60%;height:200%;background:linear-gradient(105deg,transparent 40%,rgba(200,169,81,0.03) 50%,transparent 60%);animation:bv-beam 10s ease-in-out infinite;pointer-events:none; }
+@keyframes bv-beam { 0%,100%{transform:translateX(0)} 50%{transform:translateX(40%)} }
+
+.dv-particles { position:absolute;inset:0;pointer-events:none;overflow:hidden; }
+.dv-particle { position:absolute;border-radius:50%;animation:dv-float linear infinite; }
+@keyframes dv-float { 0%{transform:translateY(0) rotate(0deg);opacity:0} 10%{opacity:1} 90%{opacity:.5} 100%{transform:translateY(-100vh) rotate(360deg);opacity:0} }
+
+.dv-eyebrow { display:inline-flex;align-items:center;gap:0.6rem;font-size:0.65rem;letter-spacing:0.45em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1.2rem;position:relative;z-index:2; }
+.dv-eyebrow::before,.dv-eyebrow::after { content:'';display:block;width:30px;height:1px;background:var(--gold);opacity:0.5; }
+.dv-hero h1 { font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:400;color:var(--white);line-height:1.15;margin-bottom:1rem;position:relative;z-index:2; }
+.dv-hero h1 em { color:var(--gold);font-style:italic; }
+.dv-hero p { font-size:0.95rem;color:var(--white-60);max-width:560px;margin:0 auto 2rem;line-height:1.8;position:relative;z-index:2; }
+
+/* Pills types de voyage */
+.dv-type-pills { display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;position:relative;z-index:2; }
+.dv-type-pill { padding:0.35rem 1rem;border:1px solid rgba(200,169,81,0.3);border-radius:20px;font-size:0.72rem;color:var(--white-60);background:rgba(200,169,81,0.05);letter-spacing:0.08em; }
+
+/* ═══ SECTION PRINCIPALE ═══ */
+.dv-main { background:var(--navy-dark);padding:4rem 2rem; }
+.dv-inner { max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:2.5rem;align-items:start; }
+
+/* ═══ FORMULAIRE ═══ */
+.dv-form-card { background:rgba(27,42,74,0.5);backdrop-filter:blur(20px);border:1px solid var(--gold-border);border-radius:6px;padding:2.5rem;box-shadow:0 30px 80px rgba(0,0,0,0.4),inset 0 1px 0 rgba(200,169,81,0.08); }
+
+.dv-form-title { font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:400;color:var(--white);margin-bottom:0.4rem; }
+.dv-form-subtitle { font-size:0.75rem;color:var(--white-60);letter-spacing:0.08em;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(200,169,81,0.12); }
+
+/* Section labels */
+.dv-section-label { font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:1.8rem 0 1rem;padding-bottom:0.5rem;border-bottom:1px solid rgba(200,169,81,0.12);display:flex;align-items:center;gap:0.5rem; }
+.dv-section-label:first-of-type { margin-top:0; }
+.dv-section-label span { font-size:0.9rem; }
+
+/* Grilles */
+.dv-grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem; }
+.dv-grid-1 { display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:1rem; }
+
+/* Groupes de champs */
+.dv-group { display:flex;flex-direction:column;gap:0.4rem; }
+.dv-group label { font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4);font-weight:600; }
+.dv-group label .dv-req { color:var(--gold);margin-left:2px; }
+
+.dv-input,.dv-select,.dv-textarea {
+  width:100%;padding:0.85rem 1rem;
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:3px;
+  color:var(--white);
+  font-family:'Raleway',sans-serif;
+  font-size:0.88rem;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+  -webkit-appearance:none;
+  outline:none;
+}
+.dv-input:focus,.dv-select:focus,.dv-textarea:focus {
+  border-color:var(--gold);
+  background:rgba(200,169,81,0.05);
+  box-shadow:0 0 0 3px rgba(200,169,81,0.1);
+}
+.dv-input::placeholder,.dv-textarea::placeholder { color:rgba(255,255,255,0.25);font-style:italic; }
+.dv-input::-webkit-calendar-picker-indicator { filter:invert(1) opacity(.3); }
+.dv-select option { background:var(--navy-mid);color:var(--white); }
+.dv-textarea { resize:vertical;min-height:110px;line-height:1.6; }
+.dv-input.error,.dv-select.error,.dv-textarea.error { border-color:var(--danger);box-shadow:0 0 0 3px rgba(224,87,87,0.12); }
+
+/* Type de voyage — cartes sélectionnables */
+.dv-type-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem; }
+.dv-type-card { position:relative;cursor:none; }
+.dv-type-card input[type="radio"] { position:absolute;opacity:0;width:0;height:0; }
+.dv-type-label {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0.9rem 0.5rem;
+  background:rgba(0,0,0,0.2);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:3px;
+  transition:all .2s;
+  text-align:center;
+}
+.dv-type-label:hover { border-color:rgba(200,169,81,0.3);background:var(--gold-dim); }
+.dv-type-card input:checked + .dv-type-label {
+  border-color:var(--gold);
+  background:var(--gold-dim);
+  box-shadow:0 0 0 1px var(--gold);
+}
+.dv-type-icon { font-size:1.4rem;margin-bottom:0.3rem;display:block; }
+.dv-type-name { font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--white-60);font-weight:600;line-height:1.3; }
+.dv-type-card input:checked + .dv-type-label .dv-type-name { color:var(--gold); }
+
+/* Budget slider */
+.dv-budget-wrap { position:relative; }
+.dv-budget-display { display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem; }
+.dv-budget-val { font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);font-weight:600; }
+.dv-budget-label { font-size:0.65rem;color:var(--white-60);letter-spacing:0.1em; }
+.dv-slider {
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;
+  background:linear-gradient(to right, var(--gold) 0%, var(--gold) 30%, rgba(255,255,255,0.1) 30%);
+  border-radius:2px;outline:none;
+  transition:background .1s;
+}
+.dv-slider::-webkit-slider-thumb { -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);border:2px solid var(--navy-dark);box-shadow:0 2px 8px rgba(200,169,81,0.4);cursor:none; }
+.dv-slider::-moz-range-thumb { width:18px;height:18px;border-radius:50%;background:var(--gold);border:2px solid var(--navy-dark);cursor:none; }
+.dv-budget-ticks { display:flex;justify-content:space-between;margin-top:0.4rem; }
+.dv-budget-tick { font-size:0.6rem;color:rgba(255,255,255,0.25); }
+
+/* Voyageurs stepper */
+.dv-stepper { display:flex;align-items:center;gap:0;border:1px solid rgba(255,255,255,0.1);border-radius:3px;background:rgba(0,0,0,0.25);overflow:hidden; }
+.dv-step-btn { width:44px;height:44px;background:transparent;border:none;border-right:1px solid rgba(255,255,255,0.08);color:var(--gold);font-size:1.2rem;cursor:none;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0; }
+.dv-step-btn:last-child { border-right:none;border-left:1px solid rgba(255,255,255,0.08); }
+.dv-step-btn:hover { background:var(--gold-dim); }
+.dv-step-val { flex:1;text-align:center;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white); }
+.dv-step-sub { font-size:0.62rem;color:var(--white-60);display:block;letter-spacing:0.08em; }
+
+/* Bouton submit */
+.dv-submit { width:100%;margin-top:1.5rem;padding:1.1rem;background:var(--gold);color:var(--navy);border:none;border-radius:3px;font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;cursor:none;transition:all .2s;box-shadow:0 4px 25px rgba(200,169,81,0.3);display:flex;align-items:center;justify-content:center;gap:0.6rem; }
+.dv-submit:hover:not(:disabled) { background:var(--gold-light);box-shadow:0 8px 35px rgba(200,169,81,0.45);transform:translateY(-1px); }
+.dv-submit:disabled { opacity:0.5;cursor:not-allowed; }
+.dv-submit svg { width:16px;height:16px; }
+
+.dv-secure { text-align:center;font-size:0.63rem;color:rgba(255,255,255,0.2);margin-top:0.8rem;letter-spacing:0.1em; }
+
+/* Erreur globale */
+.dv-error-msg { display:none;background:rgba(224,87,87,0.1);border:1px solid rgba(224,87,87,0.3);color:#FF8A8A;font-size:0.78rem;padding:0.7rem 0.9rem;border-radius:3px;margin-top:1rem;text-align:center; }
+.dv-error-msg.show { display:block; }
+
+/* Confirmation */
+.dv-confirm { display:none;text-align:center;padding:3rem 2rem; }
+.dv-confirm.show { display:block; }
+.dv-confirm-icon { font-size:4rem;margin-bottom:1rem;display:block;animation:dv-pop .4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes dv-pop { from{transform:scale(0)} to{transform:scale(1)} }
+.dv-confirm-title { font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);margin-bottom:0.6rem; }
+.dv-confirm-msg { font-size:0.85rem;color:var(--white-60);line-height:1.8;max-width:380px;margin:0 auto 1.5rem; }
+.dv-confirm-ref { display:inline-block;font-size:0.9rem;font-weight:700;color:var(--white);background:var(--gold-dim);border:1px solid var(--gold-border);padding:0.5rem 1.2rem;border-radius:3px;letter-spacing:0.1em;margin-bottom:1.5rem; }
+.dv-confirm-back { padding:0.7rem 2rem;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Raleway',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;cursor:none;border-radius:2px;transition:all .2s; }
+.dv-confirm-back:hover { background:var(--gold-dim); }
+
+/* ═══ SIDEBAR ═══ */
+.dv-sidebar { display:flex;flex-direction:column;gap:1.2rem;position:sticky;top:90px; }
+
+/* Card infos */
+.dv-info-card { background:rgba(27,42,74,0.4);border:1px solid var(--gold-border);border-radius:5px;padding:1.5rem;backdrop-filter:blur(10px); }
+.dv-info-card-title { font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:1.2rem;padding-bottom:0.6rem;border-bottom:1px solid rgba(200,169,81,0.12); }
+
+.dv-why-item { display:flex;align-items:flex-start;gap:0.7rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+.dv-why-item:last-child { border-bottom:none; }
+.dv-why-icon { font-size:1.1rem;flex-shrink:0;margin-top:0.1rem; }
+.dv-why-text strong { display:block;font-size:0.75rem;color:var(--white);font-weight:600;margin-bottom:0.15rem; }
+.dv-why-text span { font-size:0.68rem;color:var(--white-60);line-height:1.4; }
+
+/* Card délai */
+.dv-delay-card { background:linear-gradient(135deg,rgba(200,169,81,0.12),rgba(200,169,81,0.05));border:1px solid var(--gold-border);border-radius:5px;padding:1.3rem;text-align:center; }
+.dv-delay-num { font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;margin-bottom:0.2rem; }
+.dv-delay-unit { font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--white-60); }
+.dv-delay-desc { font-size:0.72rem;color:var(--white-60);margin-top:0.6rem;line-height:1.5; }
+
+/* Card contact direct */
+.dv-contact-card { background:rgba(27,42,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:5px;padding:1.3rem; }
+.dv-contact-title { font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--white-60);margin-bottom:1rem; }
+.dv-contact-item { display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;font-size:0.78rem;color:var(--white-80); }
+.dv-contact-item .dv-ci { font-size:1rem; }
+
+/* Destinations populaires */
+.dv-dest-grid { display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem; }
+.dv-dest-tag { padding:0.25rem 0.7rem;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.07);border-radius:20px;font-size:0.62rem;color:var(--white-60);transition:all .15s;cursor:none; }
+.dv-dest-tag:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+
+/* ═══ SECTION TÉMOIGNAGES ═══ */
+.dv-reviews { background:var(--navy);padding:3.5rem 2rem;border-top:1px solid rgba(200,169,81,0.1); }
+.dv-reviews-inner { max-width:960px;margin:0 auto; }
+.dv-reviews-header { text-align:center;margin-bottom:2.5rem; }
+.dv-reviews-eyebrow { display:block;font-size:0.62rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem; }
+.dv-reviews-title { font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.5vw,1.8rem);color:var(--white);font-weight:400; }
+.dv-reviews-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem; }
+.dv-review-card { background:rgba(27,42,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:1.5rem;position:relative; }
+.dv-review-card::before { content:'"';font-family:'Playfair Display',serif;font-size:4rem;color:rgba(200,169,81,0.15);position:absolute;top:0.5rem;left:1rem;line-height:1; }
+.dv-review-stars { color:var(--gold);font-size:0.8rem;margin-bottom:0.8rem; }
+.dv-review-text { font-size:0.8rem;color:var(--white-60);line-height:1.7;margin-bottom:1rem;font-style:italic; }
+.dv-review-author { font-size:0.72rem;color:var(--white);font-weight:600; }
+.dv-review-route { font-size:0.65rem;color:var(--gold);margin-top:0.15rem; }
+
+/* ===== FOOTER ===== */
+footer{ background:var(--navy-deep); color:white; }
+.footer-top{
+  padding:80px 0 60px;
+  display:grid;
+  grid-template-columns:1.8fr 1fr 1fr 1.4fr;
+  gap:40px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.footer-title{ font-size:.72rem; letter-spacing:.35em; text-transform:uppercase; color:var(--gold); margin-bottom:22px; font-weight:700; }
+.footer-desc{ color:rgba(255,255,255,.55); line-height:1.9; margin:16px 0; font-size:.88rem; }
+.footer-links{ list-style:none; display:flex; flex-direction:column; gap:13px; }
+.footer-links li, .footer-links a{ color:rgba(255,255,255,.55); font-size:.88rem; transition:.3s; }
+.footer-links a:hover{ color:var(--gold); padding-left:4px; }
+.newsletter{ display:flex; margin-top:16px; }
+.newsletter input{ flex:1; padding:13px 16px; border:none; background:rgba(255,255,255,.08); color:white; outline:none; font-family:'Raleway',sans-serif; font-size:.9rem; }
+.newsletter input::placeholder{ color:rgba(255,255,255,.3); }
+.newsletter button{ background:var(--gold); border:none; padding:0 20px; cursor:pointer; font-size:1.1rem; transition:background .3s; color:var(--navy-dark); font-weight:700; }
+.newsletter button:hover{ background:var(--gold-light); }
+.footer-bottom{ padding:22px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+.footer-copy{ color:rgba(255,255,255,.35); font-size:.82rem; }
+.footer-bottom-links{ display:flex; gap:20px; }
+.footer-bottom-links a{ color:rgba(255,255,255,.35); font-size:.82rem; transition:color .3s; }
+.footer-bottom-links a:hover{ color:var(--gold); }
+@media(max-width:960px){ .footer-top{ grid-template-columns:1fr 1fr; } }
+@media(max-width:600px){ .footer-top{ grid-template-columns:1fr; } .footer-bottom{ flex-direction:column; align-items:flex-start; } }
+
+/* ═══ REVEAL ═══ */
+.dv-reveal { opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1); }
+.dv-reveal.visible { opacity:1;transform:translateY(0); }
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:860px) { .header-nav { display:none; } .hamburger { display:flex; } }
+@media(max-width:768px) {
+  .dv-inner { grid-template-columns:1fr; }
+  .dv-sidebar { position:static; }
+  .dv-reviews-grid { grid-template-columns:1fr; }
+  .footer-top { grid-template-columns:1fr 1fr; }
+  .dv-type-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:600px) {
+  .footer-top { grid-template-columns:1fr; }
+  .dv-grid-2 { grid-template-columns:1fr; }
+  .dv-form-card { padding:1.5rem; }
+  .dv-type-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+{% csrf_token %}
+<!-- Curseur -->
+<div id="bv-cursor"></div>
+<div id="bv-cursor-ring"></div>
+
+<!-- ═══════ HEADER ═══════ -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="logo-box"><span class="logo-b">B</span><span class="logo-star">✦</span></div>
+      <div class="logo-text"><span class="logo-main">Breavy</span><span class="logo-sub">Voyages</span></div>
+    </a>
+    <nav class="header-nav">
+      <a href="{% url 'billet' %}" class="nav-link">Billet d'avion</a>
+      <a href="#" class="nav-link">Hôtels</a>
+      <a href="{% url 'devis' %}" class="nav-link active">Devis</a>
+      <a href="#" class="nav-link">Contact</a>
+    </nav>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <nav class="mobile-nav">
+    <a href="{% url 'billet' %}" class="mobile-nav-link">Billet d'avion</a>
+    <a href="#" class="mobile-nav-link">Hôtels</a>
+    <a href="{% url 'devis' %}" class="mobile-nav-link">Devis</a>
+    <a href="#" class="mobile-nav-link">Contact</a>
+  </nav>
+</div>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="dv-hero">
+  <div class="dv-particles" id="dvParticles"></div>
+  <div class="dv-eyebrow dv-reveal">✦ Voyage sur mesure</div>
+  <h1 class="dv-reveal" style="transition-delay:.1s">Votre voyage <em>personnalisé</em><br>commence ici</h1>
+  <p class="dv-reveal" style="transition-delay:.2s">Décrivez-nous votre projet de voyage. Nos experts vous préparent un devis complet et personnalisé sous 24h.</p>
+  <div class="dv-type-pills dv-reveal" style="transition-delay:.3s">
+    <span class="dv-type-pill">👨‍👩‍👧 Famille</span>
+    <span class="dv-type-pill">💑 Couple</span>
+    <span class="dv-type-pill">💍 Lune de miel</span>
+    <span class="dv-type-pill">👔 Business</span>
+    <span class="dv-type-pill">🎉 Groupe</span>
+  </div>
+</section>
+
+<!-- ═══════ FORMULAIRE + SIDEBAR ═══════ -->
+<section class="dv-main">
+  <div class="dv-inner">
+
+    <!-- FORMULAIRE -->
+    <div class="dv-form-card dv-reveal">
+
+      <!-- État formulaire -->
+      <div id="dv-form-content">
+        <div class="dv-form-title">Demande de devis</div>
+        <p class="dv-form-subtitle">Tous les champs marqués <span style="color:var(--gold)">*</span> sont obligatoires · Réponse sous 24h</p>
+
+        <div class="dv-section-label"><span>👤</span> Vos coordonnées</div>
+        <div class="dv-grid-2">
+          <div class="dv-group">
+            <label>Nom complet <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-nom" type="text" placeholder="Jean Dupont" autocomplete="name" />
+          </div>
+          <div class="dv-group">
+            <label>Téléphone <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-tel" type="tel" placeholder="+242 06 123 4567" autocomplete="tel" />
+          </div>
+        </div>
+        <div class="dv-grid-1">
+          <div class="dv-group">
+            <label>Email <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-email" type="email" placeholder="jean.dupont@email.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="dv-section-label"><span>✈</span> Votre voyage</div>
+        <div class="dv-grid-1">
+          <div class="dv-group">
+            <label>Destination souhaitée <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-destination" type="text" placeholder="Paris, Bali, New York, Santorin…" />
+          </div>
+        </div>
+        <div class="dv-grid-2">
+          <div class="dv-group">
+            <label>Date de départ <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-depart" type="date" />
+          </div>
+          <div class="dv-group">
+            <label>Date de retour <span class="dv-req">*</span></label>
+            <input class="dv-input" id="dv-retour" type="date" />
+          </div>
+        </div>
+
+        <div class="dv-section-label"><span>🎭</span> Type de voyage <span style="color:var(--gold);margin-left:2px">*</span></div>
+        <div class="dv-type-grid">
+          <label class="dv-type-card">
+            <input type="radio" name="dv-type" value="famille" />
+            <div class="dv-type-label"><span class="dv-type-icon">👨‍👩‍👧</span><span class="dv-type-name">Famille</span></div>
+          </label>
+          <label class="dv-type-card">
+            <input type="radio" name="dv-type" value="couple" />
+            <div class="dv-type-label"><span class="dv-type-icon">💑</span><span class="dv-type-name">Couple</span></div>
+          </label>
+          <label class="dv-type-card">
+            <input type="radio" name="dv-type" value="lune_miel" />
+            <div class="dv-type-label"><span class="dv-type-icon">💍</span><span class="dv-type-name">Lune de miel</span></div>
+          </label>
+          <label class="dv-type-card">
+            <input type="radio" name="dv-type" value="business" />
+            <div class="dv-type-label"><span class="dv-type-icon">👔</span><span class="dv-type-name">Business</span></div>
+          </label>
+          <label class="dv-type-card">
+            <input type="radio" name="dv-type" value="groupe" />
+            <div class="dv-type-label"><span class="dv-type-icon">🎉</span><span class="dv-type-name">Groupe</span></div>
+          </label>
+        </div>
+
+        <div class="dv-section-label"><span>👥</span> Nombre de voyageurs <span style="color:var(--gold);margin-left:2px">*</span></div>
+        <div class="dv-stepper" style="margin-bottom:1rem;">
+          <button class="dv-step-btn" type="button" onclick="dvPax(-1)">−</button>
+          <div class="dv-step-val">
+            <span id="dv-pax-num">2</span>
+            <span class="dv-step-sub" id="dv-pax-label">voyageurs</span>
+          </div>
+          <button class="dv-step-btn" type="button" onclick="dvPax(+1)">+</button>
+        </div>
+
+        <div class="dv-section-label"><span>💰</span> Budget estimé</div>
+        <div class="dv-budget-wrap" style="margin-bottom:1.5rem;">
+          <div class="dv-budget-display">
+            <div>
+              <div class="dv-budget-val" id="dv-budget-display">2 000 €</div>
+              <div class="dv-budget-label">par personne · optionnel</div>
+            </div>
+            <div style="font-size:0.7rem;color:var(--white-60);">Faites glisser</div>
+          </div>
+          <input class="dv-slider" id="dv-slider" type="range" min="500" max="20000" step="500" value="2000" oninput="dvUpdateBudget(this)" />
+          <div class="dv-budget-ticks">
+            <span class="dv-budget-tick">500 €</span>
+            <span class="dv-budget-tick">5 000 €</span>
+            <span class="dv-budget-tick">10 000 €</span>
+            <span class="dv-budget-tick">20 000 €</span>
+          </div>
+        </div>
+
+        <div class="dv-section-label"><span>💬</span> Informations complémentaires</div>
+        <div class="dv-grid-1">
+          <div class="dv-group">
+            <label>Précisez votre demande</label>
+            <textarea class="dv-textarea" id="dv-message" placeholder="Hôtel de luxe, circuit organisé, transferts inclus, régime alimentaire particulier, occasion spéciale à célébrer…"></textarea>
+          </div>
+        </div>
+
+        <div class="dv-error-msg" id="dv-error">⚠ Veuillez remplir tous les champs obligatoires.</div>
+
+        <button class="dv-submit" id="dv-submit-btn" onclick="dvSubmit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Envoyer ma demande de devis
+        </button>
+        <p class="dv-secure">🔒 Vos données sont protégées · Aucun paiement requis · Devis 100 % gratuit</p>
+      </div>
+
+      <!-- État confirmation -->
+      <div class="dv-confirm" id="dv-confirm">
+        <span class="dv-confirm-icon">✅</span>
+        <div class="dv-confirm-title">Demande envoyée !</div>
+        <p class="dv-confirm-msg">
+          Votre demande de devis a bien été reçue.<br>
+          Nos experts analysent votre projet et vous répondent <strong style="color:var(--white)">sous 24 heures</strong> avec une proposition complète et personnalisée.
+        </p>
+        <div class="dv-confirm-ref" id="dv-confirm-ref">Référence : DV-XXXXXXXX</div>
+        <br>
+        <button class="dv-confirm-back" onclick="dvReset()">← Soumettre une autre demande</button>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="dv-sidebar">
+
+      <!-- Délai de réponse -->
+      <div class="dv-delay-card dv-reveal" style="transition-delay:.1s">
+        <div class="dv-delay-num">24h</div>
+        <div class="dv-delay-unit">Délai de réponse garanti</div>
+        <p class="dv-delay-desc">Nos experts vous préparent un devis complet et personnalisé en moins de 24 heures ouvrées.</p>
+      </div>
+
+      <!-- Pourquoi nous -->
+      <div class="dv-info-card dv-reveal" style="transition-delay:.2s">
+        <div class="dv-info-card-title">✦ Pourquoi choisir Breavy</div>
+        <div class="dv-why-item">
+          <div class="dv-why-icon">🎯</div>
+          <div class="dv-why-text">
+            <strong>100 % personnalisé</strong>
+            <span>Chaque devis est créé sur mesure selon vos envies et votre budget exact.</span>
+          </div>
+        </div>
+        <div class="dv-why-item">
+          <div class="dv-why-icon">💰</div>
+          <div class="dv-why-text">
+            <strong>Meilleurs tarifs</strong>
+            <span>Accès direct aux tarifs négociés avec les compagnies et hôtels partenaires.</span>
+          </div>
+        </div>
+        <div class="dv-why-item">
+          <div class="dv-why-icon">🛡</div>
+          <div class="dv-why-text">
+            <strong>Accompagnement complet</strong>
+            <span>De la réservation jusqu'au retour : visas, transferts, assurance, assistance 24/7.</span>
+          </div>
+        </div>
+        <div class="dv-why-item">
+          <div class="dv-why-icon">✈</div>
+          <div class="dv-why-text">
+            <strong>Expertise Afrique & Europe</strong>
+            <span>Spécialistes des routes Congo, Afrique centrale, Europe et destinations long-courrier.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact direct -->
+      <div class="dv-contact-card dv-reveal" style="transition-delay:.3s">
+        <div class="dv-contact-title">Contact direct</div>
+        <div class="dv-contact-item"><span class="dv-ci">📱</span> WhatsApp : +242 06 XXX XXXX</div>
+        <div class="dv-contact-item"><span class="dv-ci">✉</span> contact@breavyvoyages.com</div>
+        <div class="dv-contact-item"><span class="dv-ci">🕐</span> Lun–Sam · 8h00 à 20h00</div>
+      </div>
+
+      <!-- Destinations populaires -->
+      <div class="dv-info-card dv-reveal" style="transition-delay:.4s">
+        <div class="dv-info-card-title">🌍 Destinations populaires</div>
+        <div class="dv-dest-grid">
+          <span class="dv-dest-tag" onclick="dvSetDest('Paris')">Paris 🗼</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Dubai')">Dubaï ✨</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Bali')">Bali 🌴</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Santorin')">Santorin 🌊</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('New York')">New York 🗽</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Île Maurice')">Île Maurice 🌺</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Zanzibar')">Zanzibar 🏖</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Lisbonne')">Lisbonne 🇵🇹</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Bangkok')">Bangkok 🛕</span>
+          <span class="dv-dest-tag" onclick="dvSetDest('Cap-Vert')">Cap-Vert 🎵</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TÉMOIGNAGES ═══════ -->
+<section class="dv-reviews">
+  <div class="dv-reviews-inner">
+    <div class="dv-reviews-header dv-reveal">
+      <span class="dv-reviews-eyebrow">Ils nous ont fait confiance</span>
+      <h2 class="dv-reviews-title">Ce que disent nos voyageurs</h2>
+    </div>
+    <div class="dv-reviews-grid">
+      <div class="dv-review-card dv-reveal">
+        <div class="dv-review-stars">★★★★★</div>
+        <p class="dv-review-text">Devis reçu en moins de 2h, tout était parfaitement organisé. Notre lune de miel à Bali était un rêve. Je recommande Breavy les yeux fermés.</p>
+        <div class="dv-review-author">Amandine & Kevin M.</div>
+        <div class="dv-review-route">✈ Brazzaville → Bali</div>
+      </div>
+      <div class="dv-review-card dv-reveal" style="transition-delay:.1s">
+        <div class="dv-review-stars">★★★★★</div>
+        <p class="dv-review-text">Voyage en famille de 5 personnes à Paris. Le devis était précis, le prix imbattable et l'équipe disponible à toute heure. Merci infiniment !</p>
+        <div class="dv-review-author">Christophe N.</div>
+        <div class="dv-review-route">✈ Kinshasa → Paris</div>
+      </div>
+      <div class="dv-review-card dv-reveal" style="transition-delay:.2s">
+        <div class="dv-review-stars">★★★★★</div>
+        <p class="dv-review-text">Groupe de 12 personnes pour un séminaire à Dubaï. Tout était parfait : vols, hôtel, transferts. Un service 5 étoiles à un prix très raisonnable.</p>
+        <div class="dv-review-author">Directeur Général, SOGE Congo</div>
+        <div class="dv-review-route">✈ Brazzaville → Dubaï</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container footer-top">
+
+    <!-- Colonne 1 : Logo + coordonnées -->
+    <div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+        <div style="width:52px;height:52px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--navy-dark);flex-shrink:0;">B</div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase;">Breanhy Voyages</div>
+          <div style="font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-top:4px;line-height:1.6;">Votre agence de voyage<br>en ligne</div>
+        </div>
+      </div>
+      <p class="footer-desc">Breanhy Voyages est une agence spécialisée dans la vente de billets d'avion et la réservation d'hôtels, pour les particuliers, les familles et les entreprises.</p>
+      <ul class="footer-links" style="gap:16px;margin-top:20px;">
+        <li style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;min-width:22px;">FR</span>
+          <span style="color:rgba(255,255,255,.75);font-size:.9rem;">+33 9 73 41 08 15</span>
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;min-width:22px;">PT</span>
+          <span style="color:rgba(255,255,255,.75);font-size:.9rem;">+351 308 813 148</span>
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1rem;min-width:22px;text-align:center;">💬</span>
+          <div>
+            <div style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;">WhatsApp Pro</div>
+            <div style="color:rgba(255,255,255,.75);font-size:.9rem;">+351 308 813 148</div>
+          </div>
+        </li>
+        <li style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1rem;min-width:22px;text-align:center;">✉️</span>
+          <div>
+            <div style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;">Email</div>
+            <div style="color:rgba(255,255,255,.75);font-size:.9rem;">contact@breanhyvoyages.com</div>
+          </div>
+        </li>
+      </ul>
+      <p style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:20px;">📍 Agence basée au Portugal · RNAVT N° 13302</p>
+    </div>
+
+    <!-- Colonne 2 : Nos Services -->
+    <div>
+      <h3 class="footer-title">Nos Services</h3>
+      <ul class="footer-links">
+        <li><a href="{% url 'billet' %}">Billets d'avion</a></li>
+        <li><a href="{% url 'hotels' %}">Réservation d'hôtels</a></li>
+        <li><a href="#">Voyages en famille</a></li>
+        <li><a href="#">Voyages d'affaires</a></li>
+        <li><a href="#">Séminaires &amp; groupes</a></li>
+        <li><a href="#">Voyages haute gamme</a></li>
+        <li><a href="#">Transferts &amp; navettes</a></li>
+      </ul>
+    </div>
+
+    <!-- Colonne 3 : Informations -->
+    <div>
+      <h3 class="footer-title">Informations</h3>
+      <ul class="footer-links">
+        <li><a href="#">À propos de nous</a></li>
+        <li><a href="#">Comment ça marche</a></li>
+        <li><a href="#">Nos engagements</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">Confidentialité</a></li>
+      </ul>
+    </div>
+
+    <!-- Colonne 4 : Newsletter + Réseaux sociaux -->
+    <div>
+      <h3 class="footer-title">Restez Informé</h3>
+      <p class="footer-desc">Recevez nos meilleures offres de vols et d'hôtels en avant-première.</p>
+      <div class="newsletter">
+        <input type="email" placeholder="Votre email...">
+        <button>→</button>
+      </div>
+
+      <h3 class="footer-title" style="margin-top:32px;">Suivez-nous</h3>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <a href="#" style="width:44px;height:44px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:.85rem;font-weight:700;transition:.3s;text-decoration:none;" onmouseenter="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='rgba(255,255,255,.6)'">f</a>
+        <a href="#" style="width:44px;height:44px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:.85rem;transition:.3s;text-decoration:none;" onmouseenter="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='rgba(255,255,255,.6)'">📷</a>
+        <a href="#" style="width:44px;height:44px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:.85rem;font-weight:700;transition:.3s;text-decoration:none;" onmouseenter="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='rgba(255,255,255,.6)'">in</a>
+        <a href="#" style="width:44px;height:44px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:1rem;transition:.3s;text-decoration:none;" onmouseenter="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='rgba(255,255,255,.6)'">💬</a>
+      </div>
+
+      <p style="font-size:.68rem;font-style:italic;color:rgba(255,255,255,.3);margin-top:20px;">✦ Licence RNAVT N° 13302 · Turismo de Portugal</p>
+    </div>
+  </div>
+
+  <!-- Barre de garanties -->
+  <div style="background:rgba(0,0,0,.25);border-top:1px solid rgba(200,169,81,.1);border-bottom:1px solid rgba(200,169,81,.1);">
+    <div class="container" style="display:flex;align-items:stretch;flex-wrap:wrap;">
+      <div style="padding:22px 24px;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700;border-right:1px solid rgba(255,255,255,.08);display:flex;align-items:center;">Nos Garanties</div>
+      <div style="display:flex;flex:1;flex-wrap:wrap;">
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:160px;">
+          <span>🔒</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Paiement sécurisé</span>
+        </div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:160px;">
+          <span>📞</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Service 7j/7</span>
+        </div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:160px;">
+          <span>✅</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Billets officiels</span>
+        </div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:160px;">
+          <span>🌍</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Monde entier</span>
+        </div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;flex:1;min-width:160px;">
+          <span>💬</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Support WhatsApp</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bas de page -->
+  <div class="container footer-bottom">
+    <div class="footer-copy">© 2026 <a href="/" style="color:var(--gold);text-decoration:none;">Breanhy Voyages</a> · Tous droits réservés · Agence officielle · Licence RNAVT N° 13302</div>
+    <div class="footer-bottom-links">
+      <a href="#">Mentions légales</a>
+      <a href="#">CGV</a>
+      <a href="#">Confidentialité</a>
+      <a href="#">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ════ CURSEUR ════ */
+const cursor = document.getElementById('bv-cursor');
+const cursorRing = document.getElementById('bv-cursor-ring');
+let mouseX=0, mouseY=0, ringX=0, ringY=0;
+document.addEventListener('mousemove', e => { mouseX=e.clientX; mouseY=e.clientY; cursor.style.left=mouseX+'px'; cursor.style.top=mouseY+'px'; });
+(function animRing() { ringX+=(mouseX-ringX)*.15; ringY+=(mouseY-ringY)*.15; cursorRing.style.left=ringX+'px'; cursorRing.style.top=ringY+'px'; requestAnimationFrame(animRing); })();
+document.querySelectorAll('button,a,input,select,textarea,.dv-type-label,.dv-dest-tag').forEach(el => {
+  el.addEventListener('mouseenter', ()=>{ cursor.classList.add('hover'); cursorRing.classList.add('hover'); });
+  el.addEventListener('mouseleave', ()=>{ cursor.classList.remove('hover'); cursorRing.classList.remove('hover'); });
+});
+
+/* ════ PARTICULES ════ */
+(function() {
+  const c = document.getElementById('dvParticles');
+  if (!c) return;
+  for (let i=0; i<24; i++) {
+    const p = document.createElement('div');
+    p.className = 'dv-particle';
+    const s = Math.random()*2.5+1;
+    p.style.cssText = `width:${s}px;height:${s}px;background:${Math.random()>.4?'#C8A951':'rgba(255,255,255,.5)'};left:${Math.random()*100}%;bottom:-10px;animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*10}s;opacity:${Math.random()*.5+.2};`;
+    c.appendChild(p);
+  }
+})();
+
+/* ════ SCROLL REVEAL ════ */
+const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);} }); }, {threshold:.1});
+document.querySelectorAll('.dv-reveal').forEach(el => obs.observe(el));
+// Hero immédiat
+setTimeout(()=>document.querySelectorAll('.dv-hero .dv-reveal').forEach(el=>el.classList.add('visible')), 80);
+
+/* ════ HEADER SCROLL ════ */
+const header = document.getElementById('siteHeader');
+window.addEventListener('scroll', ()=> header.classList.toggle('is-scrolled', window.scrollY>10));
+
+/* ════ HAMBURGER ════ */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', e => { e.stopPropagation(); hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+document.addEventListener('click', e => { if(!mobileMenu.contains(e.target)&&!hamburger.contains(e.target)){ mobileMenu.classList.remove('open'); hamburger.classList.remove('open'); } });
+
+/* ════ BUDGET SLIDER ════ */
+function dvUpdateBudget(input) {
+  const val = parseInt(input.value);
+  document.getElementById('dv-budget-display').textContent = val.toLocaleString('fr-FR') + ' €';
+  const pct = ((val - 500) / (20000 - 500)) * 100;
+  input.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(255,255,255,.1) ${pct}%)`;
+}
+dvUpdateBudget(document.getElementById('dv-slider'));
+
+/* ════ VOYAGEURS STEPPER ════ */
+let dvPaxCount = 2;
+function dvPax(delta) {
+  dvPaxCount = Math.max(1, Math.min(50, dvPaxCount + delta));
+  document.getElementById('dv-pax-num').textContent = dvPaxCount;
+  document.getElementById('dv-pax-label').textContent = dvPaxCount === 1 ? 'voyageur' : 'voyageurs';
+}
+
+/* ════ DESTINATION RAPIDE ════ */
+function dvSetDest(dest) {
+  const input = document.getElementById('dv-destination');
+  input.value = dest;
+  input.focus();
+  input.classList.remove('error');
+}
+
+/* ════ GÉNÉRATION RÉFÉRENCE ════ */
+function dvGenRef() {
+  return 'DV-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+/* ════ VALIDATION ════ */
+function dvValidate() {
+  let ok = true;
+  const required = [
+    {id:'dv-nom', check: v => v.trim().length >= 2},
+    {id:'dv-tel', check: v => v.trim().length >= 8},
+    {id:'dv-email', check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
+    {id:'dv-destination', check: v => v.trim().length >= 2},
+    {id:'dv-depart', check: v => !!v},
+    {id:'dv-retour', check: v => !!v},
+  ];
+  required.forEach(({id, check}) => {
+    const el = document.getElementById(id);
+    const valid = check(el.value);
+    el.classList.toggle('error', !valid);
+    if (!valid) ok = false;
+  });
+  // Type de voyage
+  const typeChecked = document.querySelector('input[name="dv-type"]:checked');
+  if (!typeChecked) { ok = false; }
+  // Dates cohérentes
+  const dep = document.getElementById('dv-depart').value;
+  const ret = document.getElementById('dv-retour').value;
+  if (dep && ret && ret <= dep) {
+    document.getElementById('dv-retour').classList.add('error');
+    ok = false;
+  }
+  return ok;
+}
+
+/* ════ SOUMISSION ════ */
+async function dvSubmit() {
+  const errEl = document.getElementById('dv-error');
+  errEl.classList.remove('show');
+
+  if (!dvValidate()) {
+    errEl.textContent = '⚠ Veuillez remplir tous les champs obligatoires et sélectionner un type de voyage.';
+    errEl.classList.add('show');
+    document.querySelector('.error')?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+
+  const btn = document.getElementById('dv-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg style="animation:spin .7s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity=".2"/><path d="M21 12a9 9 0 00-9-9"/></svg> Envoi en cours…';
+
+  // Données à envoyer
+  const payload = {
+    nom:              document.getElementById('dv-nom').value.trim(),
+    email:            document.getElementById('dv-email').value.trim(),
+    telephone:        document.getElementById('dv-tel').value.trim(),
+    destination:      document.getElementById('dv-destination').value.trim(),
+    date_depart:      document.getElementById('dv-depart').value,
+    date_retour:      document.getElementById('dv-retour').value,
+    nombre_voyageurs: dvPaxCount,
+    type_voyage:      document.querySelector('input[name="dv-type"]:checked')?.value || '',
+    budget:           document.getElementById('dv-slider').value,
+    message:          document.getElementById('dv-message').value.trim(),
+  };
+
+  try {
+    const res = await fetch("{% url 'soumettre_devis' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.cookie.split(';').find(c=>c.trim().startsWith('csrftoken='))?.split('=')[1] || '',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Afficher la confirmation
+      document.getElementById('dv-confirm-ref').textContent = 'Référence : ' + (data.reference || dvGenRef());
+      document.getElementById('dv-form-content').style.display = 'none';
+      document.getElementById('dv-confirm').classList.add('show');
+      window.scrollTo({top: document.querySelector('.dv-form-card').offsetTop - 100, behavior:'smooth'});
+    } else {
+      throw new Error(data.error || 'Erreur serveur');
+    }
+  } catch(err) {
+    errEl.textContent = '⚠ Une erreur est survenue. Veuillez réessayer ou nous contacter directement.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg> Envoyer ma demande de devis';
+  }
+}
+
+/* ════ RESET ════ */
+function dvReset() {
+  document.getElementById('dv-form-content').style.display = 'block';
+  document.getElementById('dv-confirm').classList.remove('show');
+  document.getElementById('dv-nom').value = '';
+  document.getElementById('dv-email').value = '';
+  document.getElementById('dv-tel').value = '';
+  document.getElementById('dv-destination').value = '';
+  document.getElementById('dv-depart').value = '';
+  document.getElementById('dv-retour').value = '';
+  document.getElementById('dv-message').value = '';
+  document.querySelector('input[name="dv-type"]:checked')?.closest('label').querySelector('input').checked && (document.querySelector('input[name="dv-type"]:checked').checked = false);
+  dvPaxCount = 2;
+  document.getElementById('dv-pax-num').textContent = 2;
+  document.getElementById('dv-pax-label').textContent = 'voyageurs';
+  document.getElementById('dv-slider').value = 2000;
+  dvUpdateBudget(document.getElementById('dv-slider'));
+  const btn = document.getElementById('dv-submit-btn');
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg> Envoyer ma demande de devis';
+}
+
+/* Styles spinner inline */
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>

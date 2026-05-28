@@ -1,0 +1,807 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Breanhy Voyages | Hôtels & Hébergements</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#1B2A4A; --navy-dark:#12203A; --navy-deep:#0D1828;
+      --gold:#C8A951; --gold-light:#DFC278; --gold-pale:#f0d98a;
+      --cream:#F8F5EE; --white:#FFFFFF; --muted:#6B7280;
+      --error:#dc2626; --success:#16a34a;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{ font-family:'Raleway',sans-serif; background:#fff; color:#111827; overflow-x:hidden; }
+    a{ text-decoration:none; }
+    img{ max-width:100%; display:block; }
+    .container{ width:min(1100px,90%); margin:auto; }
+    .site-header{ position:fixed; top:0; left:0; right:0; height:70px; z-index:100; background:#F3EFE6; box-shadow:0 2px 12px rgba(27,42,74,0.09); }
+    .header-inner{ max-width:1280px; margin:auto; padding:0 28px; height:100%; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .header-logo{ display:flex; align-items:center; flex-shrink:0; border:1px solid rgba(27,42,74,0.15); padding:4px 8px; background:#fff; height:40px; margin-top:4px; box-shadow:0 2px 8px rgba(27,42,74,0.1); }
+    .logo-img{ height:40px; width:auto; object-fit:contain; }
+    .header-nav{ display:flex; align-items:center; gap:36px; margin-left:auto; }
+    .nav-link{ font-size:.875rem; font-weight:600; color:var(--navy); letter-spacing:.02em; position:relative; padding-bottom:4px; transition:color .2s; }
+    .nav-link::after{ content:''; position:absolute; bottom:0; left:0; width:0; height:2px; background:var(--navy); transition:width .25s; }
+    .nav-link:hover::after,.nav-link.active::after{ width:100%; }
+    .lang-selector{ display:flex; align-items:center; gap:6px; font-size:.875rem; font-weight:600; color:var(--navy); cursor:pointer; padding:6px 12px; border:1px solid rgba(27,42,74,0.25); border-radius:4px; flex-shrink:0; }
+    .lang-selector svg{ width:18px; height:18px; }
+    .lang-selector .chevron{ font-size:.7rem; margin-left:2px; }
+    .hamburger{ display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; background:none; border:none; flex-shrink:0; }
+    .hamburger span{ display:block; width:24px; height:2px; background:var(--navy); transition:transform .3s, opacity .3s; border-radius:2px; }
+    .hamburger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2){ opacity:0; }
+    .hamburger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+    .mobile-menu{ position:fixed; top:70px; left:0; right:0; background:#F3EFE6; border-top:1px solid rgba(27,42,74,0.1); max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.4,0,.2,1); z-index:99; box-shadow:0 8px 30px rgba(0,0,0,.1); }
+    .mobile-menu.open{ max-height:400px; }
+    .mobile-nav{ width:min(1100px,90%); margin:auto; display:flex; flex-direction:column; padding:20px 0; }
+    .mobile-nav-link{ font-size:.9rem; color:var(--navy); font-weight:600; padding:14px 0; border-bottom:1px solid rgba(27,42,74,0.08); transition:color .2s, padding-left .2s; }
+    .mobile-nav-link:hover{ color:var(--gold); padding-left:8px; }
+    .mobile-cta{ margin-top:20px; background:var(--navy); color:white; padding:14px 28px; font-size:.8rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; text-align:center; display:block; border-radius:4px; }
+    @media(max-width:768px){ .header-nav,.lang-selector{ display:none; } .hamburger{ display:flex; } }
+    .page-content{ padding-top:70px; }
+    .bv-hero{ background:#111D33; padding:3rem 2rem 2.5rem; text-align:center; }
+    .bv-ey{ display:inline-block; font-size:0.72rem; letter-spacing:0.4em; text-transform:uppercase; color:#C8A951; font-weight:600; margin-bottom:0.8rem; padding:0.35rem 1rem; border:1px solid rgba(200,169,81,0.35); }
+    .bv-hero h1{ font-family:'Playfair Display',serif; font-size:clamp(1.6rem,4vw,2.5rem); color:#fff; font-weight:400; line-height:1.2; margin-bottom:0.6rem; }
+    .bv-hero h1 em{ color:#C8A951; font-style:italic; }
+    .bv-hero p{ font-size:0.9rem; color:rgba(255,255,255,0.55); max-width:520px; margin:0 auto; line-height:1.8; }
+    .search-section{ background:#111D33; padding:0 1.5rem 3rem; }
+    .search-box{ max-width:1000px; margin:0 auto; background:#1B2A4A; border:1px solid rgba(200,169,81,0.2); border-radius:4px; padding:2rem; }
+    .search-title{ font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:1.2rem; }
+    .hotel-search-form{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr auto; gap:0.75rem; align-items:end; }
+    .form-group{ display:flex; flex-direction:column; gap:0.35rem; }
+    .form-group label{ font-size:0.62rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+    .form-group input, .form-group select{ background:rgba(255,255,255,0.06); border:1px solid rgba(200,169,81,0.2); color:#fff; padding:0.75rem 1rem; font-family:'Raleway',sans-serif; font-size:0.88rem; border-radius:2px; outline:none; width:100%; transition:border-color .2s; }
+    .form-group input:focus,.form-group select:focus{ border-color:var(--gold); background:rgba(200,169,81,0.06); }
+    .form-group input::placeholder{ color:rgba(255,255,255,0.3); }
+    .form-group select option{ background:var(--navy-dark); color:#fff; }
+    .btn-search{ background:var(--gold); color:var(--navy-dark); border:none; padding:0.75rem 1.8rem; font-family:'Raleway',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:.3s; white-space:nowrap; height:fit-content; display:flex; align-items:center; gap:0.5rem; }
+    .btn-search:hover{ background:var(--gold-light); transform:translateY(-1px); }
+    .btn-search:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+    .spinner{ display:none; width:18px; height:18px; border:2px solid rgba(27,42,74,0.3); border-top-color:var(--navy-dark); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .loading-state{ text-align:center; padding:3rem; background:var(--cream); display:none; }
+    .loading-state.visible{ display:block; }
+    .loading-spinner-lg{ width:40px; height:40px; border:3px solid rgba(27,42,74,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 1rem; }
+    .alert{ padding:1rem 1.5rem; border-radius:2px; font-size:0.88rem; margin:1rem auto; max-width:1000px; display:none; }
+    .alert.visible{ display:block; }
+    .alert-error{ background:#fef2f2; border:1px solid #fca5a5; color:var(--error); }
+    .results-section{ background:var(--cream); padding:2.5rem 1.5rem; display:none; }
+    .results-section.visible{ display:block; }
+    .results-header{ max-width:1000px; margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    .results-count{ font-size:0.8rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+    .results-info{ font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--navy); }
+    .results-sort{ display:flex; align-items:center; gap:0.5rem; }
+    .results-sort label{ font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.15em; }
+    .results-sort select{ font-size:0.8rem; border:1px solid #e5e7eb; padding:0.4rem 0.7rem; border-radius:2px; color:var(--navy); background:#fff; cursor:pointer; }
+    .hotels-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1.2rem; max-width:1000px; margin:0 auto; }
+    .hotel-card{ background:#fff; border:1px solid rgba(27,42,74,0.08); border-radius:2px; overflow:hidden; transition:border-color .2s, box-shadow .2s; cursor:pointer; }
+    .hotel-card:hover{ border-color:var(--gold); box-shadow:0 4px 20px rgba(200,169,81,0.12); }
+    .hotel-card-img{ width:100%; height:180px; object-fit:cover; background:#e5e7eb; position:relative; overflow:hidden; }
+    .hotel-card-img img{ width:100%; height:100%; object-fit:cover; }
+    .hotel-card-img-placeholder{ width:100%; height:100%; background:linear-gradient(135deg,#1B2A4A,#2a3f6f); display:flex; align-items:center; justify-content:center; font-size:2rem; }
+    .hotel-stars-badge{ position:absolute; top:0.6rem; left:0.6rem; background:var(--navy); color:var(--gold); font-size:0.65rem; padding:0.2rem 0.6rem; font-weight:700; }
+    .hotel-category-badge{ position:absolute; top:0.6rem; right:0.6rem; background:rgba(200,169,81,0.92); color:var(--navy-dark); font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:0.2rem 0.55rem; }
+    .hotel-card-body{ padding:1.1rem; }
+    .hotel-card-zone{ font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:0.3rem; }
+    .hotel-card-name{ font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--navy); margin-bottom:0.4rem; line-height:1.2; }
+    .hotel-card-address{ font-size:0.78rem; color:var(--muted); margin-bottom:0.6rem; line-height:1.4; }
+    .hotel-card-facilities{ display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.8rem; }
+    .facility-tag{ font-size:0.65rem; color:var(--navy); background:rgba(27,42,74,0.06); padding:0.18rem 0.45rem; border-radius:2px; }
+    .hotel-card-foot{ padding:0.9rem 1.1rem; border-top:1px solid rgba(27,42,74,0.07); display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+    .hotel-price-amount{ font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--navy); font-weight:600; }
+    .hotel-price-label{ font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.15em; }
+    .btn-select-hotel{ background:var(--navy); color:#fff; border:none; padding:0.55rem 1.2rem; font-family:'Raleway',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:.25s; white-space:nowrap; flex-shrink:0; }
+    .btn-select-hotel:hover{ background:var(--gold); color:var(--navy-dark); }
+    .no-results{ text-align:center; padding:3rem; max-width:500px; margin:0 auto; display:none; }
+    .no-results.visible{ display:block; }
+    .booking-panel{ background:#fff; border-top:3px solid var(--gold); padding:2.5rem 1.5rem; display:none; }
+    .booking-panel.visible{ display:block; }
+    .booking-inner{ max-width:1000px; margin:0 auto; display:grid; grid-template-columns:1fr 360px; gap:2rem; align-items:start; }
+    .hotel-detail-name{ font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--navy); margin-bottom:0.3rem; }
+    .hotel-detail-stars{ color:var(--gold); font-size:1rem; margin-bottom:0.3rem; }
+    .hotel-detail-address{ font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem; }
+    .hotel-detail-img{ width:100%; height:220px; border-radius:2px; margin-bottom:1.2rem; background:linear-gradient(135deg,#1B2A4A,#2a3f6f); display:flex; align-items:center; justify-content:center; font-size:3rem; overflow:hidden; }
+    .hotel-detail-img img{ width:100%; height:100%; object-fit:cover; }
+    .rooms-title{ font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--navy); margin-bottom:1rem; }
+    .room-card{ border:1px solid rgba(27,42,74,0.12); border-radius:2px; padding:1rem; margin-bottom:0.75rem; cursor:pointer; transition:.2s; }
+    .room-card:hover{ border-color:var(--gold); }
+    .room-card.selected{ border-color:var(--gold); border-width:2px; background:#fffdf5; }
+    .room-card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
+    .room-name{ font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:0.2rem; }
+    .room-board{ font-size:0.75rem; color:var(--muted); }
+    .room-cancellation{ font-size:0.7rem; margin-top:0.4rem; }
+    .room-cancellation.free{ color:var(--success); font-weight:600; }
+    .room-cancellation.non-refund{ color:var(--error); }
+    .room-price-box{ text-align:right; flex-shrink:0; }
+    .room-price{ font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--navy); font-weight:600; }
+    .room-price-nights{ font-size:0.65rem; color:var(--muted); }
+    .btn-room-select{ margin-top:0.5rem; background:var(--navy); color:#fff; border:none; padding:0.4rem 1rem; font-family:'Raleway',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:.2s; white-space:nowrap; }
+    .btn-room-select:hover{ background:var(--gold); color:var(--navy-dark); }
+    .btn-room-select.selected-btn{ background:var(--gold); color:var(--navy-dark); }
+    .guest-form-title{ font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--navy); margin-bottom:1rem; margin-top:1.5rem; }
+    .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem; }
+    .form-field{ display:flex; flex-direction:column; gap:0.3rem; }
+    .form-field label{ font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+    .form-field input,.form-field select{ border:1px solid #e5e7eb; padding:0.7rem 0.9rem; font-family:'Raleway',sans-serif; font-size:0.88rem; border-radius:2px; outline:none; color:var(--navy); transition:border-color .2s; }
+    .form-field input:focus,.form-field select:focus{ border-color:var(--gold); }
+    .form-field.full{ grid-column:1/-1; }
+    .booking-summary{ background:var(--navy); border-radius:2px; padding:1.5rem; position:sticky; top:90px; }
+    .booking-summary-title{ font-family:'Playfair Display',serif; color:#fff; font-size:1rem; margin-bottom:1rem; }
+    .summary-row{ display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.08); font-size:0.82rem; gap:0.5rem; }
+    .summary-row:last-child{ border-bottom:none; }
+    .summary-label{ color:rgba(255,255,255,0.6); flex-shrink:0; }
+    .summary-val{ color:#fff; font-weight:600; text-align:right; }
+    .summary-total{ display:flex; justify-content:space-between; padding:1rem 0 0; margin-top:0.5rem; border-top:2px solid rgba(200,169,81,0.3); }
+    .summary-total .summary-label{ color:var(--gold); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; font-size:0.72rem; }
+    .summary-total .summary-val{ font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--gold); }
+    .cancellation-policy{ background:rgba(255,255,255,0.05); border:1px solid rgba(200,169,81,0.2); border-radius:2px; padding:0.8rem; margin-top:1rem; font-size:0.75rem; color:rgba(255,255,255,0.7); line-height:1.5; }
+    .cancellation-policy strong{ color:var(--gold); display:block; margin-bottom:0.3rem; }
+    .btn-book{ width:100%; margin-top:1.2rem; background:var(--gold); color:var(--navy-dark); border:none; padding:1rem; font-family:'Raleway',sans-serif; font-size:0.85rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:.3s; display:flex; align-items:center; justify-content:center; gap:0.75rem; }
+    .btn-book:hover{ background:var(--gold-light); }
+    .btn-book:disabled{ opacity:0.5; cursor:not-allowed; }
+    .btn-book .book-spinner{ width:18px; height:18px; border:2px solid rgba(27,42,74,0.3); border-top-color:var(--navy-dark); border-radius:50%; animation:spin .7s linear infinite; display:none; }
+    .btn-back{ width:100%; margin-top:0.75rem; background:transparent; border:1px solid rgba(255,255,255,0.15); padding:0.75rem; font-family:'Raleway',sans-serif; font-size:0.75rem; color:rgba(255,255,255,0.5); cursor:pointer; border-radius:2px; transition:.2s; }
+    .btn-back:hover{ border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.8); }
+    .confirmation-panel{ display:none; padding:4rem 2rem; text-align:center; background:var(--cream); }
+    .confirmation-panel.visible{ display:block; }
+    .confirm-icon{ font-size:4rem; margin-bottom:1rem; }
+    .confirm-title{ font-family:'Playfair Display',serif; font-size:2rem; color:var(--navy); margin-bottom:0.5rem; }
+    .confirm-ref{ font-size:1.1rem; color:var(--gold); font-weight:700; letter-spacing:0.1em; margin-bottom:1rem; }
+    .confirm-text{ color:var(--muted); max-width:500px; margin:0 auto 2rem; line-height:1.8; }
+    .confirm-details{ display:inline-grid; grid-template-columns:1fr 1fr; gap:1rem; background:#fff; padding:1.5rem 2rem; border:1px solid rgba(27,42,74,0.08); border-radius:2px; text-align:left; margin-bottom:2rem; }
+    .confirm-item label{ font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold); font-weight:700; }
+    .confirm-item span{ display:block; font-size:0.9rem; color:var(--navy); font-weight:600; margin-top:0.2rem; }
+    .bv-sl{ background:#F8F5EE; padding:3rem 1.5rem; }
+    .bv-sd{ background:#111D33; padding:3rem 1.5rem; }
+    .bv-sh{ text-align:center; margin-bottom:1.8rem; }
+    .bv-st{ display:block; font-size:0.7rem; letter-spacing:0.35em; text-transform:uppercase; color:#C8A951; font-weight:600; margin-bottom:0.5rem; }
+    .bv-sl .bv-sh h2{ font-family:'Playfair Display',serif; font-size:clamp(1.4rem,3vw,2rem); font-weight:400; color:#1B2A4A; }
+    .bv-sd .bv-sh h2{ font-family:'Playfair Display',serif; font-size:clamp(1.4rem,3vw,2rem); font-weight:400; color:#fff; }
+    .bv-dv{ width:40px; height:2px; background:#C8A951; margin:0.6rem auto 0; }
+    .bv-tbl{ width:100%; max-width:1100px; margin:0 auto; border-collapse:separate; border-spacing:10px; }
+    .bv-tbl td{ width:33.333%; padding:0; vertical-align:top; }
+    .bv-tbl-4 td{ width:25%; }
+    .bv-hc{ display:block; width:100%; border-radius:2px; overflow:hidden; background:#fff; box-shadow:0 4px 18px rgba(0,0,0,0.1); }
+    .bv-hc-img{ width:100%; height:180px; background-size:cover !important; background-position:center !important; background-repeat:no-repeat !important; position:relative; }
+    .bv-hc-stars{ position:absolute; top:0.7rem; left:0.7rem; background:#1B2A4A; color:#C8A951; font-size:0.68rem; padding:0.2rem 0.55rem; }
+    .bv-hc-badge{ position:absolute; top:0.7rem; right:0.7rem; background:rgba(200,169,81,0.92); color:#1B2A4A; font-size:0.58rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:0.2rem 0.55rem; }
+    .bv-hc-body{ padding:1rem; }
+    .bv-hc-loc{ font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:#C8A951; font-weight:600; margin-bottom:0.3rem; }
+    .bv-hc-name{ font-family:'Playfair Display',serif; font-size:1rem; color:#1B2A4A; margin-bottom:0.35rem; line-height:1.2; }
+    .bv-hc-desc{ font-size:0.82rem; color:#555; line-height:1.5; margin-bottom:0.6rem; }
+    .bv-hc-tags{ display:flex; flex-wrap:wrap; gap:0.3rem; }
+    .bv-tag{ font-size:0.66rem; color:#1B2A4A; background:rgba(27,42,74,0.07); padding:0.18rem 0.45rem; }
+    .bv-hc-foot{ padding:0.75rem 1rem; border-top:1px solid rgba(27,42,74,0.07); display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; }
+    .bv-soon{ font-size:0.8rem; color:#C8A951; font-weight:600; }
+    .bv-notif{ font-size:0.72rem; color:rgba(27,42,74,0.45); border-bottom:1px solid rgba(200,169,81,0.4); }
+    .bv-hcd{ display:block; width:100%; border-radius:2px; overflow:hidden; background:#1B2A4A; box-shadow:0 4px 18px rgba(0,0,0,0.25); }
+    .bv-hcd .bv-hc-loc{ color:#C8A951; }
+    .bv-hcd .bv-hc-name{ color:#fff; }
+    .bv-hcd .bv-hc-desc{ color:rgba(255,255,255,0.6); }
+    .bv-hcd .bv-tag{ background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.7); }
+    .bv-hcd .bv-hc-foot{ border-top-color:rgba(200,169,81,0.12); }
+    .bv-hcd .bv-notif{ color:rgba(255,255,255,0.3); border-bottom-color:rgba(200,169,81,0.3); }
+    .bv-cta{ background:var(--navy); padding:4rem 2rem; text-align:center; }
+    .bv-cta h3{ font-family:'Playfair Display',serif; font-size:clamp(1.4rem,3vw,2rem); color:#fff; font-weight:400; margin-bottom:0.8rem; }
+    .bv-cta h3 em{ color:var(--gold); font-style:italic; }
+    .bv-cta p{ font-size:0.92rem; color:rgba(255,255,255,0.6); max-width:480px; margin:0 auto 1.8rem; line-height:1.8; }
+    .bv-btn{ display:inline-block; background:var(--gold); color:var(--navy-dark); padding:0.9rem 2.2rem; font-family:'Raleway',sans-serif; font-size:0.82rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; border-radius:2px; transition:background .3s, transform .2s; }
+    .bv-btn:hover{ background:var(--gold-light); transform:translateY(-2px); }
+
+    /* ===== AUTOCOMPLETE ===== */
+    .autocomplete-wrapper{ position:relative; }
+    .autocomplete-dropdown{
+      position:absolute; top:calc(100% + 4px); left:0; right:0;
+      background:#0D1828; border:1px solid rgba(200,169,81,0.35);
+      border-radius:2px; z-index:200; max-height:260px; overflow-y:auto;
+      box-shadow:0 8px 30px rgba(0,0,0,0.5);
+      display:none;
+    }
+    .autocomplete-dropdown.open{ display:block; }
+    .autocomplete-item{
+      padding:0.65rem 1rem; font-size:0.85rem; color:rgba(255,255,255,0.85);
+      cursor:pointer; display:flex; align-items:center; gap:0.6rem;
+      border-bottom:1px solid rgba(255,255,255,0.04); transition:background .15s;
+      font-family:'Raleway',sans-serif;
+    }
+    .autocomplete-item:last-child{ border-bottom:none; }
+    .autocomplete-item:hover, .autocomplete-item.active{ background:rgba(200,169,81,0.12); color:#fff; }
+    .autocomplete-item .ac-flag{ font-size:1rem; flex-shrink:0; }
+    .autocomplete-item .ac-city{ font-weight:600; }
+    .autocomplete-item .ac-country{ font-size:0.72rem; color:rgba(200,169,81,0.7); margin-left:auto; letter-spacing:0.05em; }
+    .autocomplete-item em{ color:var(--gold); font-style:normal; }
+
+    /* ===== ABOUT — style page accueil ===== */
+    .about{ background:var(--cream); padding:120px 0; position:relative; overflow:hidden; }
+    .about::before{ content:'"'; position:absolute; right:-20px; top:-60px; font-family:'Playfair Display',serif; font-size:30rem; color:rgba(200,169,81,.04); line-height:1; pointer-events:none; user-select:none; }
+    .about-grid{ display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+    .eyebrow{ font-size:.7rem; letter-spacing:.4em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+    .eyebrow::before{ content:''; width:40px; height:1px; background:var(--gold); }
+    .title{ font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3.4rem); line-height:1.2; color:var(--navy); margin-bottom:25px; font-weight:400; }
+    .title em{ color:var(--gold); font-style:italic; }
+    .divider{ width:60px; height:2px; background:linear-gradient(90deg,var(--gold),transparent); margin-bottom:30px; }
+    .text{ font-size:.95rem; line-height:2; color:#4B5563; margin-bottom:18px; }
+    .text strong{ color:var(--navy); }
+    .features{ margin:40px 0; display:flex; flex-direction:column; gap:20px; }
+    .feature{ display:flex; gap:18px; align-items:flex-start; padding:20px; background:white; border-left:3px solid transparent; transition:border-color .3s, transform .3s, box-shadow .3s; }
+    .feature:hover{ border-left-color:var(--gold); transform:translateX(6px); box-shadow:6px 0 30px rgba(200,169,81,.08); }
+    .feature-icon{ width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:rgba(200,169,81,.12); border:1px solid rgba(200,169,81,.3); flex-shrink:0; font-size:1.1rem; color:#fff; }
+    .feature-text{ font-size:.92rem; line-height:1.7; color:#4B5563; }
+    .feature-text strong{ display:block; color:var(--navy); margin-bottom:5px; }
+    .buttons{ display:flex; gap:16px; flex-wrap:wrap; margin-top:44px; }
+    .btn-gold{ background:var(--gold); color:var(--navy-dark); padding:16px 30px; text-transform:uppercase; letter-spacing:.2em; font-size:.75rem; font-weight:700; transition:.3s; position:relative; overflow:hidden; display:inline-block; }
+    .btn-gold::before{ content:''; position:absolute; inset:0; background:var(--gold-pale); transform:translateX(-100%); transition:transform .35s; }
+    .btn-gold:hover::before{ transform:translateX(0); }
+    .btn-gold:hover{ transform:translateY(-2px); box-shadow:0 10px 25px rgba(200,169,81,.3); }
+    .btn-gold span{ position:relative; z-index:1; }
+    .btn-outline{ border:1px solid rgba(27,42,74,.2); color:var(--navy); padding:16px 30px; text-transform:uppercase; letter-spacing:.2em; font-size:.75rem; transition:.3s; display:inline-block; }
+    .btn-outline:hover{ border-color:var(--gold); color:var(--gold); transform:translateY(-2px); }
+    .about-media{ position:relative; display:flex; align-items:center; justify-content:center; }
+    .about-image{ position:relative; display:inline-block; }
+    .about-image img{ width:520px; height:520px; object-fit:cover; border-radius:50%; display:block; position:relative; z-index:2; box-shadow:0 20px 60px rgba(27,42,74,0.2); transition:transform .6s ease; }
+    .about-image:hover img{ transform:scale(1.03); }
+    .badge{ position:absolute; right:-10px; bottom:30px; background:var(--navy); padding:24px 28px; border-left:4px solid var(--gold); z-index:5; box-shadow:0 8px 30px rgba(0,0,0,0.25); }
+    .badge-number{ font-size:2.2rem; font-family:'Playfair Display',serif; color:var(--gold); font-weight:600; line-height:1; }
+    .badge-text{ font-size:.6rem; color:rgba(255,255,255,.75); text-transform:uppercase; letter-spacing:.2em; margin-top:6px; font-weight:600; }
+
+    .reveal{ opacity:0; transform:translateY(40px); transition:opacity .8s ease, transform .8s ease; }
+    .reveal.visible{ opacity:1; transform:translateY(0); }
+    .reveal-delay-1{ transition-delay:.1s; }
+    .reveal-delay-2{ transition-delay:.2s; }
+    .reveal-delay-3{ transition-delay:.3s; }
+    .reveal-delay-4{ transition-delay:.4s; }
+
+    footer{ background:var(--navy-deep); color:white; }
+    .footer-top{ padding:80px 0 60px; display:grid; grid-template-columns:2fr 1fr 1fr 1.5fr; gap:40px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .footer-title{ font-size:.85rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); margin-bottom:25px; font-weight:700; }
+    .footer-desc{ color:rgba(255,255,255,.6); line-height:1.9; margin:20px 0; font-size:.95rem; }
+    .footer-links{ list-style:none; display:flex; flex-direction:column; gap:14px; }
+    .footer-links li,.footer-links a{ color:rgba(255,255,255,.55); font-size:.9rem; transition:.3s; }
+    .footer-links a:hover{ color:var(--gold); padding-left:4px; }
+    .newsletter{ display:flex; margin-top:20px; }
+    .newsletter input{ flex:1; padding:14px; border:none; background:rgba(255,255,255,.08); color:white; outline:none; font-family:'Raleway',sans-serif; }
+    .newsletter input::placeholder{ color:rgba(255,255,255,.3); }
+    .newsletter button{ background:var(--gold); border:none; padding:0 20px; cursor:pointer; font-size:1rem; transition:background .3s; }
+    .newsletter button:hover{ background:var(--gold-light); }
+    .footer-bottom{ padding:25px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+    .footer-copy{ color:rgba(255,255,255,.35); font-size:.85rem; }
+    .footer-bottom-links{ display:flex; gap:20px; }
+    .footer-bottom-links a{ color:rgba(255,255,255,.35); font-size:.85rem; transition:color .3s; }
+    .footer-bottom-links a:hover{ color:var(--gold); }
+
+    @media(max-width:900px){ .footer-top{ grid-template-columns:1fr 1fr; } .about-grid{ grid-template-columns:1fr; } .about-media{ order:-1; } .about-image img{ width:300px; height:300px; } .booking-inner{ grid-template-columns:1fr; } .confirm-details{ grid-template-columns:1fr; } }
+    @media(max-width:800px){ .bv-tbl,.bv-tbl-4{ display:block; width:100%; border-spacing:0; } .bv-tbl tbody,.bv-tbl-4 tbody{ display:grid; grid-template-columns:1fr 1fr; gap:10px; } .bv-tbl tr,.bv-tbl-4 tr{ display:contents; } .bv-tbl td,.bv-tbl-4 td{ display:block; width:100% !important; padding:0; } .bv-hc-img{ height:160px; width:100%; display:block; background-size:cover !important; background-position:center !important; background-repeat:no-repeat !important; } .hotel-search-form{ grid-template-columns:1fr 1fr; } }
+    @media(max-width:640px){ .hotel-search-form{ grid-template-columns:1fr; } .search-box{ padding:1.2rem; } .btn-search{ width:100%; justify-content:center; } .results-header{ flex-direction:column; align-items:flex-start; } .hotels-grid{ grid-template-columns:1fr; } .form-row{ grid-template-columns:1fr; } .room-card-top{ flex-direction:column; align-items:flex-start; } .room-price-box{ text-align:left; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-top:0.5rem; } .room-price-nights{ margin:0; } .btn-room-select{ margin-top:0; } .hotel-card-foot{ flex-direction:column; align-items:flex-start; gap:0.75rem; } .btn-select-hotel{ width:100%; text-align:center; } .bv-cta{ padding:3rem 1.5rem; } .bv-btn{ width:100%; text-align:center; } .about{ padding:3rem 0; } .about-image img{ width:240px; height:240px; } .badge{ right:0; bottom:10px; padding:0.8rem 1rem; } .badge-number{ font-size:1.5rem; } .buttons{ flex-direction:column; } .btn-gold,.btn-outline{ text-align:center; } }
+    @media(max-width:480px){ .bv-tbl tbody,.bv-tbl-4 tbody{ grid-template-columns:1fr; } .bv-hc-img{ height:170px; } .confirm-details{ grid-template-columns:1fr; } .footer-top{ grid-template-columns:1fr; } .footer-bottom{ flex-direction:column; align-items:flex-start; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo"><img src="{% static 'Images/logo.jpg' %}" alt="Breanhy Voyages" class="logo-img"></a>
+    <nav class="header-nav">
+      <a href="{% url 'billet' %}" class="nav-link">Billet d'avion</a>
+      <a href="{% url 'hotels' %}" class="nav-link active">Hôtels</a>
+      <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+    </nav>
+    <div class="lang-selector">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span>Français</span><span class="chevron">▾</span>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-nav">
+    <a href="{% url 'billet' %}" class="mobile-nav-link">✈ Billet d'avion</a>
+    <a href="{% url 'hotels' %}" class="mobile-nav-link">🏨 Hôtels</a>
+    <a href="{% url 'contact' %}" class="mobile-nav-link">📩 Contact</a>
+    <a href="{% url 'devis' %}" class="mobile-cta">✈ Demander un devis gratuit</a>
+  </div>
+</div>
+
+<div class="page-content">
+
+  <section class="bv-hero">
+    <div class="bv-ey">🏨 Hôtels &amp; Hébergements</div>
+    <h1>Dormez dans les <em>plus belles adresses</em></h1>
+    <p>Recherchez et réservez votre hôtel — disponibilités réelles, prix en temps réel.</p>
+  </section>
+
+  <section class="search-section">
+    <div class="search-box">
+      <div class="search-title">🔍 Rechercher un hôtel</div>
+      <form id="hotelSearchForm" class="hotel-search-form" autocomplete="off">
+        <div class="form-group">
+          <label>Destination</label>
+          <div class="autocomplete-wrapper" id="destWrapper">
+            <input type="text" id="hotelDestination" placeholder="Paris, Lisbonne, Dubaï…" required autocomplete="off">
+            <div class="autocomplete-dropdown" id="destDropdown" role="listbox" aria-label="Suggestions de villes"></div>
+          </div>
+        </div>
+        <div class="form-group"><label>Arrivée</label><input type="date" id="checkIn" required></div>
+        <div class="form-group"><label>Départ</label><input type="date" id="checkOut" required></div>
+        <div class="form-group"><label>Adultes</label><select id="adults"><option value="1">1 adulte</option><option value="2" selected>2 adultes</option><option value="3">3 adultes</option><option value="4">4 adultes</option></select></div>
+        <div class="form-group"><label>Chambres</label><select id="rooms"><option value="1" selected>1 chambre</option><option value="2">2 chambres</option><option value="3">3 chambres</option></select></div>
+        <button type="submit" class="btn-search" id="searchBtn"><span id="searchBtnText">Rechercher</span><div class="spinner" id="searchSpinner"></div></button>
+      </form>
+    </div>
+  </section>
+
+  <div class="loading-state" id="loadingState">
+    <div class="loading-spinner-lg"></div>
+    <p style="font-size:0.95rem;color:var(--muted);">Recherche des meilleurs hôtels en cours…</p>
+  </div>
+
+  <div class="alert alert-error" id="searchError" style="background:var(--cream);padding:0 1.5rem;"></div>
+
+  <section class="results-section" id="resultsSection">
+    <div class="results-header">
+      <div><div class="results-count" id="resultsCount"></div><div class="results-info" id="resultsInfo"></div></div>
+      <div class="results-sort">
+        <label>Trier par</label>
+        <select id="sortSelect" onchange="sortHotels()"><option value="price">Prix (croissant)</option><option value="stars">Étoiles</option><option value="name">Nom</option></select>
+      </div>
+    </div>
+    <div class="no-results" id="noResults">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">🏨</div>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:0.5rem;">Aucun hôtel disponible</h3>
+      <p style="color:var(--muted);font-size:0.9rem;">Essayez d'autres dates ou une autre destination.</p>
+    </div>
+    <div class="hotels-grid" id="hotelsGrid"></div>
+  </section>
+
+  <section class="booking-panel" id="bookingPanel">
+    <div class="booking-inner">
+      <div>
+        <div id="hotelDetail">
+          <div class="hotel-detail-img" id="hotelDetailImg">🏨</div>
+          <div class="hotel-detail-name" id="hotelDetailName"></div>
+          <div class="hotel-detail-stars" id="hotelDetailStars"></div>
+          <div class="hotel-detail-address" id="hotelDetailAddress"></div>
+        </div>
+        <div class="rooms-title">🛏 Choisissez votre chambre</div>
+        <div id="roomsList"></div>
+        <div id="guestForm" style="display:none;">
+          <div class="guest-form-title">👤 Informations du client</div>
+          <div class="form-row">
+            <div class="form-field"><label>Civilité</label><select id="guestTitle"><option value="MR">M.</option><option value="MS">Mme</option></select></div>
+            <div class="form-field"><label>Prénom *</label><input type="text" id="guestFirstName" placeholder="Jean" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Nom *</label><input type="text" id="guestLastName" placeholder="Dupont" required></div>
+            <div class="form-field"><label>Email *</label><input type="email" id="guestEmail" placeholder="jean@exemple.com" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Téléphone *</label><input type="tel" id="guestPhone" placeholder="+33 6 00 00 00 00" required></div>
+            <div class="form-field"><label>Nationalité</label><select id="guestNationality"><option value="FR">Française</option><option value="PT">Portugaise</option><option value="CG">Congolaise (BZV)</option><option value="CD">Congolaise (KIN)</option><option value="BE">Belge</option><option value="GB">Britannique</option><option value="US">Américaine</option><option value="MA">Marocaine</option><option value="SN">Sénégalaise</option><option value="CI">Ivoirienne</option><option value="CM">Camerounaise</option><option value="GA">Gabonaise</option><option value="OTHER">Autre</option></select></div>
+          </div>
+          <div class="form-row"><div class="form-field full"><label>Demandes spéciales (optionnel)</label><input type="text" id="guestSpecialRequests" placeholder="Chambre haute, lit bébé, arrivée tardive…"></div></div>
+          <div id="bookingAlert" class="alert alert-error"></div>
+        </div>
+      </div>
+      <div>
+        <div class="booking-summary" id="bookingSummary">
+          <div class="booking-summary-title">📋 Résumé de votre séjour</div>
+          <div id="summaryContent"></div>
+          <div class="summary-total"><span class="summary-label">Total</span><span class="summary-val" id="summaryTotal">—</span></div>
+          <div class="cancellation-policy" id="cancellationPolicy" style="display:none;"><strong>⚠️ Politique d'annulation</strong><span id="cancellationText"></span></div>
+          <button class="btn-book" id="bookBtn" onclick="submitBooking()" style="display:none;" disabled><span id="bookBtnText">Confirmer la réservation</span><div class="book-spinner" id="bookSpinner"></div></button>
+          <button class="btn-back" onclick="cancelBooking()">← Retour aux résultats</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="confirmation-panel" id="confirmationPanel">
+    <div class="confirm-icon">✅</div>
+    <h2 class="confirm-title">Réservation confirmée !</h2>
+    <div class="confirm-ref" id="confirmRef"></div>
+    <p class="confirm-text">Votre hôtel est réservé. Un email de confirmation vous a été envoyé. Présentez ce numéro de référence à l'hôtel à votre arrivée.</p>
+    <div class="confirm-details" id="confirmDetails"></div>
+    <a href="{% url 'hotels' %}" style="display:inline-block;background:var(--navy);color:#fff;padding:1rem 2.5rem;font-family:'Raleway',sans-serif;font-size:0.8rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border-radius:2px;margin-top:1rem;">Nouvelle recherche</a>
+  </section>
+
+  <section class="bv-sl">
+    <div class="bv-sh"><span class="bv-st">🏰 Europe</span><h2>Hôtels en Europe</h2><div class="bv-dv"></div></div>
+    <table class="bv-tbl"><tbody><tr>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">✦ Coup de ♥</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Lisbonne, Portugal</div><div class="bv-hc-name">Boutique-hôtels de Lisbonne</div><div class="bv-hc-desc">D'Alfama au Chiado, des adresses de charme avec vue sur le Tage.</div><div class="bv-hc-tags"><span class="bv-tag">🌊 Vue Tage</span><span class="bv-tag">🛎 Concierge</span><span class="bv-tag">🍳 Petit-déj.</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80')"><div class="bv-hc-stars">★★★★</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Paris, France</div><div class="bv-hc-name">Hôtels parisiens</div><div class="bv-hc-desc">Du Marais à Montmartre, les meilleures adresses pour vivre Paris.</div><div class="bv-hc-tags"><span class="bv-tag">🗼 Monuments</span><span class="bv-tag">🚇 Centre</span><span class="bv-tag">🥐 Breakfast</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌊 Vue mer</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Santorin, Grèce</div><div class="bv-hc-name">Villas de Santorin</div><div class="bv-hc-desc">Maisons blanches, piscines à débordement face à la caldeira.</div><div class="bv-hc-tags"><span class="bv-tag">🏊 Piscine privée</span><span class="bv-tag">🌅 Coucher soleil</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+    </tr><tr>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🏖 Balnéaire</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Algarve, Portugal</div><div class="bv-hc-name">Resorts en Algarve</div><div class="bv-hc-desc">Les plus belles plages de la péninsule ibérique, resorts de luxe.</div><div class="bv-hc-tags"><span class="bv-tag">🏊 Piscine</span><span class="bv-tag">🏖 Plage</span><span class="bv-tag">🍽 Restaurant</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=600&q=80')"><div class="bv-hc-stars">★★★★</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Italie</div><div class="bv-hc-name">Hôtels en Italie</div><div class="bv-hc-desc">De Rome à Venise, des palaces historiques aux boutique-hôtels.</div><div class="bv-hc-tags"><span class="bv-tag">🏛 Histoire</span><span class="bv-tag">🍝 Gastronomie</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌺 Nature</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Madère, Portugal</div><div class="bv-hc-name">Hôtels à Madère</div><div class="bv-hc-desc">L'île fleur de l'Atlantique — hôtels avec vue sur l'océan.</div><div class="bv-hc-tags"><span class="bv-tag">🌊 Vue mer</span><span class="bv-tag">🌿 Nature</span><span class="bv-tag">🍷 Gastronomie</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+    </tr></tbody></table>
+  </section>
+
+  <section class="bv-sd">
+    <div class="bv-sh"><span class="bv-st">🌍 Notre spécialité</span><h2>Afrique &amp; Îles</h2><div class="bv-dv"></div></div>
+    <table class="bv-tbl-4 bv-tbl"><tbody><tr>
+      <td><div class="bv-hcd"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">✦ Spécialité</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Cap-Vert — Sal</div><div class="bv-hc-name">Resorts au Cap-Vert</div><div class="bv-hc-desc">Plages de sable blanc, eaux turquoise, resorts tout inclus.</div><div class="bv-hc-tags"><span class="bv-tag">🌊 All inclusive</span><span class="bv-tag">🏄 Sports</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hcd"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80')"><div class="bv-hc-stars">★★★★</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Dakar, Sénégal</div><div class="bv-hc-name">Hôtels à Dakar</div><div class="bv-hc-desc">Adresses de charme face à l'Atlantique dans la capitale sénégalaise.</div><div class="bv-hc-tags"><span class="bv-tag">🌊 Bord de mer</span><span class="bv-tag">🍽 Cuisine</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hcd"><div class="bv-hc-img" style="background-image:url('https://images.pexels.com/photos/1320684/pexels-photo-1320684.jpeg?auto=compress&cs=tinysrgb&w=600')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌴 Paradis</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Zanzibar, Tanzanie</div><div class="bv-hc-name">Lodges Zanzibar</div><div class="bv-hc-desc">Eaux cristallines et lodges de luxe face à l'océan Indien.</div><div class="bv-hc-tags"><span class="bv-tag">🐠 Snorkeling</span><span class="bv-tag">🌅 Coucher soleil</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hcd"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1562602833-0f4ab2fc46e3?w=600&q=80')"><div class="bv-hc-stars">★★★★</div><div class="bv-hc-badge">🦎 Unique</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Madagascar</div><div class="bv-hc-name">Écolodges Madagascar</div><div class="bv-hc-desc">Une faune unique — écolodges immergés dans la nature malgache.</div><div class="bv-hc-tags"><span class="bv-tag">🌿 Nature</span><span class="bv-tag">🦁 Faune</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+    </tr></tbody></table>
+  </section>
+
+  <section class="bv-sl">
+    <div class="bv-sh"><span class="bv-st">🌎🌏 Long-courrier</span><h2>Amériques, Caraïbes &amp; Asie</h2><div class="bv-dv"></div></div>
+    <table class="bv-tbl-4 bv-tbl"><tbody><tr>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌟 Populaire</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Rio de Janeiro, Brésil</div><div class="bv-hc-name">Hôtels à Rio</div><div class="bv-hc-desc">Ipanema, Copacabana — plages mythiques et hôtels face à l'Atlantique.</div><div class="bv-hc-tags"><span class="bv-tag">🏖 Plage</span><span class="bv-tag">🌅 Vue mer</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌴 All inclusive</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Punta Cana, Rép. Dom.</div><div class="bv-hc-name">Resorts Tout Inclus</div><div class="bv-hc-desc">Les plus grands complexes hôteliers des Caraïbes face à une mer turquoise.</div><div class="bv-hc-tags"><span class="bv-tag">🍹 All inclusive</span><span class="bv-tag">🏊 Piscines</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">🌺 Coup de ♥</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Phuket, Thaïlande</div><div class="bv-hc-name">Villas &amp; Resorts Thaïlande</div><div class="bv-hc-desc">Piscines à débordement sur les collines de Phuket face aux îles.</div><div class="bv-hc-tags"><span class="bv-tag">🏊 Infinity pool</span><span class="bv-tag">🌺 Spa</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+      <td><div class="bv-hc"><div class="bv-hc-img" style="background-image:url('https://images.unsplash.com/photo-1518684079-3c830dcef090?w=600&q=80')"><div class="bv-hc-stars">★★★★★</div><div class="bv-hc-badge">✨ Luxe</div></div><div class="bv-hc-body"><div class="bv-hc-loc">📍 Dubaï, Émirats</div><div class="bv-hc-name">Hôtels à Dubaï</div><div class="bv-hc-desc">Palaces de luxe face aux gratte-ciels et à la mer d'Arabie.</div><div class="bv-hc-tags"><span class="bv-tag">🏙 Skyline</span><span class="bv-tag">🛍 Shopping</span></div></div><div class="bv-hc-foot"><span class="bv-soon">Tarifs à venir</span><a href="mailto:contact@breanhyvoyages.com" class="bv-notif">Me notifier →</a></div></div></td>
+    </tr></tbody></table>
+  </section>
+
+  <section class="bv-cta">
+    <h3>Une adresse vous fait <em>rêver</em> ?</h3>
+    <p>Contactez-nous dès maintenant. Nous préparons votre sélection personnalisée dès l'ouverture.</p>
+    <a href="mailto:contact@breanhyvoyages.com" class="bv-btn">✉ Nous écrire</a>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container about-grid">
+      <div>
+        <p class="eyebrow reveal">Qui sommes-nous</p>
+        <h2 class="title reveal reveal-delay-1">Votre agence de<br><em>réservation de voyages</em></h2>
+        <div class="divider reveal reveal-delay-2"></div>
+        <p class="text reveal reveal-delay-2"><strong>Breanhy Voyages</strong> est une agence de voyages en ligne spécialisée dans la vente de billets d'avion et la réservation d'hôtels à travers le monde.</p>
+        <p class="text reveal reveal-delay-3">Nous accompagnons nos clients avec une approche <strong>humaine, rigoureuse et haute gamme</strong> — pour que chaque voyage soit une expérience sans stress, de la réservation jusqu'au retour.</p>
+        <div class="features">
+          <div class="feature reveal reveal-delay-1">
+            <div class="feature-icon">✈</div>
+            <div class="feature-text"><strong>Billets d'avion dans le monde entier</strong>Économique, Affaires ou Première Classe — nous trouvons les meilleures options pour votre budget.</div>
+          </div>
+          <div class="feature reveal reveal-delay-2">
+            <div class="feature-icon">🏨</div>
+            <div class="feature-text"><strong>Hôtels &amp; hébergements sélectionnés</strong>Des adresses vérifiées pour les familles, les entreprises et les voyageurs haute gamme.</div>
+          </div>
+          <div class="feature reveal reveal-delay-3">
+            <div class="feature-icon">💼</div>
+            <div class="feature-text"><strong>Voyages d'affaires &amp; séminaires</strong>Gestion complète de vos déplacements professionnels et groupes corporate.</div>
+          </div>
+        </div>
+        <div class="buttons reveal reveal-delay-4">
+          <a href="{% url 'billet' %}" class="btn-gold"><span>✈ Rechercher un vol</span></a>
+          <a href="{% url 'contact' %}" class="btn-outline">Nous contacter</a>
+        </div>
+      </div>
+      <div class="about-media reveal reveal-delay-2">
+        <div class="about-image">
+          <img src="{% static 'Images/image.PNG' %}" alt="Breanhy Voyages — Agence de voyages">
+          <div class="badge"><div class="badge-number">100%</div><div class="badge-text">Service personnalisé</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container footer-top">
+    <div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+        <div style="width:52px;height:52px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--navy-dark);flex-shrink:0;">B</div>
+        <div><div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase;">Breanhy Voyages</div><div style="font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-top:4px;line-height:1.6;">Votre agence de voyage<br>en ligne</div></div>
+      </div>
+      <p class="footer-desc">Agence spécialisée dans la vente de billets d'avion et la réservation d'hôtels pour les particuliers et les entreprises.</p>
+      <ul class="footer-links" style="gap:16px;margin-top:20px;">
+        <li style="display:flex;align-items:center;gap:12px;"><span style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;min-width:22px;">FR</span><span style="color:rgba(255,255,255,.75);font-size:.9rem;">+33 9 73 41 08 15</span></li>
+        <li style="display:flex;align-items:center;gap:12px;"><span style="font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;min-width:22px;">PT</span><span style="color:rgba(255,255,255,.75);font-size:.9rem;">+351 308 813 148</span></li>
+        <li style="display:flex;align-items:center;gap:12px;"><span style="font-size:1rem;min-width:22px;">✉️</span><span style="color:rgba(255,255,255,.75);font-size:.9rem;">contact@breanhyvoyages.com</span></li>
+      </ul>
+      <p style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:20px;">📍 Agence basée au Portugal · RNAVT N° 13302</p>
+    </div>
+    <div><h3 class="footer-title">Nos Services</h3><ul class="footer-links"><li><a href="{% url 'billet' %}">Billets d'avion</a></li><li><a href="{% url 'hotels' %}">Réservation d'hôtels</a></li><li><a href="#">Voyages en famille</a></li><li><a href="#">Voyages d'affaires</a></li><li><a href="#">Séminaires &amp; groupes</a></li></ul></div>
+    <div><h3 class="footer-title">Informations</h3><ul class="footer-links"><li><a href="#">À propos de nous</a></li><li><a href="{% url 'contact' %}">Contact</a></li><li><a href="#">FAQ</a></li><li><a href="#">Mentions légales</a></li><li><a href="#">Confidentialité</a></li></ul></div>
+    <div><h3 class="footer-title">Restez Informé</h3><p class="footer-desc">Recevez nos meilleures offres en avant-première.</p><div class="newsletter"><input type="email" placeholder="Votre email..."><button>→</button></div></div>
+  </div>
+  <div style="background:rgba(0,0,0,.25);border-top:1px solid rgba(200,169,81,.1);border-bottom:1px solid rgba(200,169,81,.1);">
+    <div class="container" style="display:flex;align-items:stretch;flex-wrap:wrap;">
+      <div style="padding:22px 24px;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700;border-right:1px solid rgba(255,255,255,.08);display:flex;align-items:center;">Nos Garanties</div>
+      <div style="display:flex;flex:1;flex-wrap:wrap;">
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:140px;"><span>🔒</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Paiement sécurisé</span></div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:140px;"><span>📞</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Service 7j/7</span></div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;border-right:1px solid rgba(255,255,255,.08);flex:1;min-width:140px;"><span>✅</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Hôtels certifiés</span></div>
+        <div style="padding:22px 28px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;"><span>💬</span><span style="font-size:.8rem;color:rgba(255,255,255,.7);">Support WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <div class="footer-copy">© 2026 <a href="/" style="color:var(--gold);text-decoration:none;">Breanhy Voyages</a> · Tous droits réservés · Licence RNAVT N° 13302</div>
+    <div class="footer-bottom-links"><a href="#">Mentions légales</a><a href="#">CGV</a><a href="#">Confidentialité</a></div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   BASE DE DONNÉES DES VILLES (monde entier, accent-tolerant)
+   ============================================================ */
+const CITIES = [
+  // Europe
+  {city:"Abidjan",country:"Côte d'Ivoire",flag:"🇨🇮"},
+  {city:"Accra",country:"Ghana",flag:"🇬🇭"},
+  {city:"Alger",country:"Algérie",flag:"🇩🇿"},
+  {city:"Alicante",country:"Espagne",flag:"🇪🇸"},
+  {city:"Amsterdam",country:"Pays-Bas",flag:"🇳🇱"},
+  {city:"Athènes",country:"Grèce",flag:"🇬🇷"},
+  {city:"Barcelone",country:"Espagne",flag:"🇪🇸"},
+  {city:"Bordeaux",country:"France",flag:"🇫🇷"},
+  {city:"Bruxelles",country:"Belgique",flag:"🇧🇪"},
+  {city:"Bucarest",country:"Roumanie",flag:"🇷🇴"},
+  {city:"Budapest",country:"Hongrie",flag:"🇭🇺"},
+  {city:"Berlin",country:"Allemagne",flag:"🇩🇪"},
+  // C
+  {city:"Casablanca",country:"Maroc",flag:"🇲🇦"},
+  {city:"Copenhague",country:"Danemark",flag:"🇩🇰"},
+  {city:"Conakry",country:"Guinée",flag:"🇬🇳"},
+  {city:"Cotonou",country:"Bénin",flag:"🇧🇯"},
+  // D
+  {city:"Dakar",country:"Sénégal",flag:"🇸🇳"},
+  {city:"Douala",country:"Cameroun",flag:"🇨🇲"},
+  {city:"Dubaï",country:"Émirats arabes unis",flag:"🇦🇪"},
+  {city:"Dublin",country:"Irlande",flag:"🇮🇪"},
+  // E–F
+  {city:"Florence",country:"Italie",flag:"🇮🇹"},
+  {city:"Francfort",country:"Allemagne",flag:"🇩🇪"},
+  // G
+  {city:"Genève",country:"Suisse",flag:"🇨🇭"},
+  // I
+  {city:"Istanbul",country:"Turquie",flag:"🇹🇷"},
+  // K
+  {city:"Kinshasa",country:"RD Congo",flag:"🇨🇩"},
+  // L
+  {city:"Lagos",country:"Nigéria",flag:"🇳🇬"},
+  {city:"Libreville",country:"Gabon",flag:"🇬🇦"},
+  {city:"Lisbonne",country:"Portugal",flag:"🇵🇹"},
+  {city:"Londres",country:"Royaume-Uni",flag:"🇬🇧"},
+  {city:"Los Angeles",country:"États-Unis",flag:"🇺🇸"},
+  {city:"Lomé",country:"Togo",flag:"🇹🇬"},
+  {city:"Lyon",country:"France",flag:"🇫🇷"},
+  // M
+  {city:"Madagascar",country:"Madagascar",flag:"🇲🇬"},
+  {city:"Madrid",country:"Espagne",flag:"🇪🇸"},
+  {city:"Marseille",country:"France",flag:"🇫🇷"},
+  {city:"Maurice (Île)",country:"Maurice",flag:"🇲🇺"},
+  {city:"Milan",country:"Italie",flag:"🇮🇹"},
+  {city:"Montréal",country:"Canada",flag:"🇨🇦"},
+  {city:"Moscou",country:"Russie",flag:"🇷🇺"},
+  {city:"Mumbai",country:"Inde",flag:"🇮🇳"},
+  // N
+  {city:"Nairobi",country:"Kenya",flag:"🇰🇪"},
+  {city:"New York",country:"États-Unis",flag:"🇺🇸"},
+  {city:"Nice",country:"France",flag:"🇫🇷"},
+  // O
+  {city:"Oslo",country:"Norvège",flag:"🇳🇴"},
+  // P
+  {city:"Paris",country:"France",flag:"🇫🇷"},
+  {city:"Pékin",country:"Chine",flag:"🇨🇳"},
+  {city:"Pointe-Noire",country:"Congo",flag:"🇨🇬"},
+  {city:"Prague",country:"Tchéquie",flag:"🇨🇿"},
+  {city:"Phuket",country:"Thaïlande",flag:"🇹🇭"},
+  {city:"Punta Cana",country:"Rép. Dominicaine",flag:"🇩🇴"},
+  // R
+  {city:"Rabat",country:"Maroc",flag:"🇲🇦"},
+  {city:"Rio de Janeiro",country:"Brésil",flag:"🇧🇷"},
+  {city:"Rome",country:"Italie",flag:"🇮🇹"},
+  // S
+  {city:"San Francisco",country:"États-Unis",flag:"🇺🇸"},
+  {city:"Santorin",country:"Grèce",flag:"🇬🇷"},
+  {city:"São Paulo",country:"Brésil",flag:"🇧🇷"},
+  {city:"Séville",country:"Espagne",flag:"🇪🇸"},
+  {city:"Singapour",country:"Singapour",flag:"🇸🇬"},
+  {city:"Stockholm",country:"Suède",flag:"🇸🇪"},
+  // T
+  {city:"Tokyo",country:"Japon",flag:"🇯🇵"},
+  {city:"Toronto",country:"Canada",flag:"🇨🇦"},
+  {city:"Tunis",country:"Tunisie",flag:"🇹🇳"},
+  // V–Z
+  {city:"Venise",country:"Italie",flag:"🇮🇹"},
+  {city:"Vienne",country:"Autriche",flag:"🇦🇹"},
+  {city:"Yaoundé",country:"Cameroun",flag:"🇨🇲"},
+  {city:"Zanzibar",country:"Tanzanie",flag:"🇹🇿"},
+  {city:"Zurich",country:"Suisse",flag:"🇨🇭"},
+  // Extra
+  {city:"Abuja",country:"Nigéria",flag:"🇳🇬"},
+  {city:"Addis-Abeba",country:"Éthiopie",flag:"🇪🇹"},
+  {city:"Banjul",country:"Gambie",flag:"🇬🇲"},
+  {city:"Bamako",country:"Mali",flag:"🇲🇱"},
+  {city:"Bangui",country:"Rép. Centrafricaine",flag:"🇨🇫"},
+  {city:"Brazzaville",country:"Congo",flag:"🇨🇬"},
+  {city:"Cap-Vert (Sal)",country:"Cap-Vert",flag:"🇨🇻"},
+  {city:"Chicago",country:"États-Unis",flag:"🇺🇸"},
+  {city:"Duala",country:"Cameroun",flag:"🇨🇲"},
+  {city:"Freetown",country:"Sierra Leone",flag:"🇸🇱"},
+  {city:"Haïfa",country:"Israël",flag:"🇮🇱"},
+  {city:"Ho Chi Minh-Ville",country:"Viêt Nam",flag:"🇻🇳"},
+  {city:"Hong Kong",country:"Chine",flag:"🇭🇰"},
+  {city:"Jakarta",country:"Indonésie",flag:"🇮🇩"},
+  {city:"Johannesburg",country:"Afrique du Sud",flag:"🇿🇦"},
+  {city:"Kampala",country:"Ouganda",flag:"🇺🇬"},
+  {city:"Kuala Lumpur",country:"Malaisie",flag:"🇲🇾"},
+  {city:"Le Caire",country:"Égypte",flag:"🇪🇬"},
+  {city:"Luanda",country:"Angola",flag:"🇦🇴"},
+  {city:"Lusaka",country:"Zambie",flag:"🇿🇲"},
+  {city:"Madère",country:"Portugal",flag:"🇵🇹"},
+  {city:"Malé",country:"Maldives",flag:"🇲🇻"},
+  {city:"Manille",country:"Philippines",flag:"🇵🇭"},
+  {city:"Marrakech",country:"Maroc",flag:"🇲🇦"},
+  {city:"Miami",country:"États-Unis",flag:"🇺🇸"},
+  {city:"Mogadiscio",country:"Somalie",flag:"🇸🇴"},
+  {city:"Montpellier",country:"France",flag:"🇫🇷"},
+  {city:"Nantes",country:"France",flag:"🇫🇷"},
+  {city:"Niamey",country:"Niger",flag:"🇳🇪"},
+  {city:"N'Djamena",country:"Tchad",flag:"🇹🇩"},
+  {city:"Ouagadougou",country:"Burkina Faso",flag:"🇧🇫"},
+  {city:"Panama City",country:"Panama",flag:"🇵🇦"},
+  {city:"Phnom Penh",country:"Cambodge",flag:"🇰🇭"},
+  {city:"Porto",country:"Portugal",flag:"🇵🇹"},
+  {city:"Praia",country:"Cap-Vert",flag:"🇨🇻"},
+  {city:"Reykjavik",country:"Islande",flag:"🇮🇸"},
+  {city:"Riyad",country:"Arabie Saoudite",flag:"🇸🇦"},
+  {city:"Santiago",country:"Chili",flag:"🇨🇱"},
+  {city:"Séoul",country:"Corée du Sud",flag:"🇰🇷"},
+  {city:"Sydney",country:"Australie",flag:"🇦🇺"},
+  {city:"Taipei",country:"Taïwan",flag:"🇹🇼"},
+  {city:"Tanger",country:"Maroc",flag:"🇲🇦"},
+  {city:"Tel Aviv",country:"Israël",flag:"🇮🇱"},
+  {city:"Toulouse",country:"France",flag:"🇫🇷"},
+  {city:"Tripoli",country:"Libye",flag:"🇱🇾"},
+  {city:"Vancouver",country:"Canada",flag:"🇨🇦"},
+  {city:"Varsovie",country:"Pologne",flag:"🇵🇱"},
+  {city:"Windhoek",country:"Namibie",flag:"🇳🇦"},
+];
+
+/* Normalise une chaîne : supprime accents, met en minuscules */
+function normalize(str){
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+
+/* ============================================================
+   AUTOCOMPLETE ENGINE
+   ============================================================ */
+function initAutocomplete(inputId, dropdownId){
+  const input   = document.getElementById(inputId);
+  const dropdown= document.getElementById(dropdownId);
+  let activeIdx = -1;
+  let visible   = false;
+
+  function highlight(text, query){
+    const nText  = normalize(text);
+    const nQuery = normalize(query);
+    const idx    = nText.indexOf(nQuery);
+    if(idx === -1) return text;
+    return text.slice(0,idx)
+      + '<em>' + text.slice(idx, idx+query.length) + '</em>'
+      + text.slice(idx+query.length);
+  }
+
+  function render(query){
+    const q = query.trim();
+    if(q.length < 1){ close(); return; }
+    const nq = normalize(q);
+    const matches = CITIES.filter(c => normalize(c.city).startsWith(nq)).slice(0,8);
+
+    if(!matches.length){ close(); return; }
+
+    dropdown.innerHTML = '';
+    activeIdx = -1;
+
+    matches.forEach((c, i) => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.setAttribute('role','option');
+      item.innerHTML =
+        `<span class="ac-flag" aria-hidden="true">${c.flag}</span>`+
+        `<span class="ac-city">${highlight(c.city, q)}</span>`+
+        `<span class="ac-country">${c.country}</span>`;
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        select(c.city);
+      });
+      dropdown.appendChild(item);
+    });
+
+    dropdown.classList.add('open');
+    visible = true;
+  }
+
+  function select(value){
+    input.value = value;
+    close();
+    input.focus();
+  }
+
+  function close(){
+    dropdown.classList.remove('open');
+    visible = false;
+    activeIdx = -1;
+  }
+
+  function setActive(idx){
+    const items = dropdown.querySelectorAll('.autocomplete-item');
+    items.forEach(el => el.classList.remove('active'));
+    if(idx >= 0 && idx < items.length){
+      items[idx].classList.add('active');
+      activeIdx = idx;
+    } else {
+      activeIdx = -1;
+    }
+  }
+
+  input.addEventListener('input', () => render(input.value));
+  input.addEventListener('focus', () => { if(input.value.trim()) render(input.value); });
+
+  input.addEventListener('keydown', e => {
+    const items = dropdown.querySelectorAll('.autocomplete-item');
+    if(!visible) return;
+    if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      setActive(Math.min(activeIdx+1, items.length-1));
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      setActive(Math.max(activeIdx-1, 0));
+    } else if(e.key === 'Enter'){
+      if(activeIdx >= 0 && items[activeIdx]){
+        e.preventDefault();
+        select(items[activeIdx].querySelector('.ac-city').textContent);
+      }
+    } else if(e.key === 'Escape'){
+      close();
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if(!e.target.closest('#'+dropdownId) && e.target !== input) close();
+  });
+}
+
+/* Lance l'autocomplete sur le champ Destination */
+initAutocomplete('hotelDestination', 'destDropdown');
+
+/* ============================================================
+   LOGIQUE HÔTELS (identique à l'original)
+   ============================================================ */
+const STATE = { hotels:[], selectedHotel:null, selectedRoom:null, searchParams:{}, checkrateData:null };
+const today=new Date().toISOString().split('T')[0];
+const tomorrow=new Date(Date.now()+86400000).toISOString().split('T')[0];
+const nextDay=new Date(Date.now()+2*86400000).toISOString().split('T')[0];
+document.getElementById('checkIn').min=today; document.getElementById('checkIn').value=tomorrow;
+document.getElementById('checkOut').min=tomorrow; document.getElementById('checkOut').value=nextDay;
+document.getElementById('checkIn').addEventListener('change',function(){ const next=new Date(new Date(this.value).getTime()+86400000).toISOString().split('T')[0]; document.getElementById('checkOut').min=next; if(document.getElementById('checkOut').value<=this.value) document.getElementById('checkOut').value=next; });
+document.getElementById('hotelSearchForm').addEventListener('submit',async(e)=>{ e.preventDefault(); await searchHotels(); });
+async function searchHotels(){ const destination=document.getElementById('hotelDestination').value.trim(); const checkIn=document.getElementById('checkIn').value; const checkOut=document.getElementById('checkOut').value; const adults=document.getElementById('adults').value; const rooms=document.getElementById('rooms').value; if(!destination||!checkIn||!checkOut) return; STATE.searchParams={destination,checkIn,checkOut,adults,rooms}; hideAll(); document.getElementById('loadingState').classList.add('visible'); document.getElementById('searchBtn').disabled=true; document.getElementById('searchBtnText').textContent='Recherche…'; document.getElementById('searchSpinner').style.display='block'; const params=new URLSearchParams({destination,check_in:checkIn,check_out:checkOut,adults,rooms}); try{ const resp=await fetch(`/hotels/search/?${params}`); const data=await resp.json(); document.getElementById('loadingState').classList.remove('visible'); document.getElementById('searchBtn').disabled=false; document.getElementById('searchBtnText').textContent='Rechercher'; document.getElementById('searchSpinner').style.display='none'; if(!resp.ok){ showError(data.details||data.error||'Erreur lors de la recherche.'); return; } STATE.hotels=data.hotels||[]; renderHotels(destination,checkIn,checkOut); }catch(err){ document.getElementById('loadingState').classList.remove('visible'); document.getElementById('searchBtn').disabled=false; document.getElementById('searchBtnText').textContent='Rechercher'; document.getElementById('searchSpinner').style.display='none'; showError('Erreur de connexion.'); } }
+function renderHotels(destination,checkIn,checkOut){ const section=document.getElementById('resultsSection'); section.classList.add('visible'); const nights=Math.round((new Date(checkOut)-new Date(checkIn))/86400000); document.getElementById('resultsInfo').textContent=`${destination} · ${formatDate(checkIn)} → ${formatDate(checkOut)} · ${nights} nuit${nights>1?'s':''}`; if(!STATE.hotels.length){ document.getElementById('hotelsGrid').innerHTML=''; document.getElementById('noResults').classList.add('visible'); document.getElementById('resultsCount').textContent='0 hôtel trouvé'; return; } document.getElementById('noResults').classList.remove('visible'); document.getElementById('resultsCount').textContent=`${STATE.hotels.length} hôtel${STATE.hotels.length>1?'s':''} disponible${STATE.hotels.length>1?'s':''}`; displayHotels(); section.scrollIntoView({behavior:'smooth',block:'start'}); }
+function displayHotels(){ const grid=document.getElementById('hotelsGrid'); grid.innerHTML=''; STATE.hotels.forEach((hotel,idx)=>{ const minRate=hotel.minRate||'—'; const currency=hotel.currency||'EUR'; const stars=parseInt(hotel.categoryCode)||0; const starsStr=stars>0?'★'.repeat(Math.min(stars,5)):''; const imgUrl=hotel.images?.[0]||''; const facilities=(hotel.facilities||[]).slice(0,4); const card=document.createElement('div'); card.className='hotel-card'; card.dataset.idx=idx; card.innerHTML=`<div class="hotel-card-img">${imgUrl?`<img src="${imgUrl}" alt="${hotel.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=hotel-card-img-placeholder>🏨</div>'">`:`<div class="hotel-card-img-placeholder">🏨</div>`}${starsStr?`<div class="hotel-stars-badge">${starsStr}</div>`:''}${hotel.categoryName?`<div class="hotel-category-badge">${hotel.categoryName}</div>`:''}</div><div class="hotel-card-body"><div class="hotel-card-zone">${hotel.zoneName||hotel.destinationName||''}</div><div class="hotel-card-name">${hotel.name}</div><div class="hotel-card-address">${hotel.address?hotel.address+(hotel.city?', '+hotel.city:''):''}</div><div class="hotel-card-facilities">${facilities.map(f=>`<span class="facility-tag">${f}</span>`).join('')}</div></div><div class="hotel-card-foot"><div class="hotel-price"><div class="hotel-price-amount">${parseFloat(minRate).toFixed(2)} ${currency}</div><div class="hotel-price-label">à partir de / nuit</div></div><button class="btn-select-hotel" onclick="selectHotel(${idx})">Voir les chambres</button></div>`; grid.appendChild(card); }); }
+function sortHotels(){ const by=document.getElementById('sortSelect').value; STATE.hotels.sort((a,b)=>{ if(by==='price') return parseFloat(a.minRate||0)-parseFloat(b.minRate||0); if(by==='stars') return (parseInt(b.categoryCode)||0)-(parseInt(a.categoryCode)||0); if(by==='name') return (a.name||'').localeCompare(b.name||''); return 0; }); displayHotels(); }
+async function selectHotel(idx){ const hotel=STATE.hotels[idx]; STATE.selectedHotel=hotel; STATE.selectedRoom=null; document.getElementById('resultsSection').classList.remove('visible'); document.getElementById('bookingPanel').classList.add('visible'); document.getElementById('bookingPanel').scrollIntoView({behavior:'smooth'}); document.getElementById('hotelDetailName').textContent=hotel.name; const stars=parseInt(hotel.categoryCode)||0; document.getElementById('hotelDetailStars').textContent=stars>0?'★'.repeat(Math.min(stars,5))+` (${hotel.categoryName||''})`:''; document.getElementById('hotelDetailAddress').textContent=[hotel.address,hotel.city,hotel.countryCode].filter(Boolean).join(', '); const imgEl=document.getElementById('hotelDetailImg'); if(hotel.images?.[0]) imgEl.innerHTML=`<img src="${hotel.images[0]}" alt="${hotel.name}" style="width:100%;height:100%;object-fit:cover;">`; renderRooms(hotel.rooms||[]); buildSummaryBase(); }
+function renderRooms(rooms){ const list=document.getElementById('roomsList'); list.innerHTML=''; if(!rooms.length){ list.innerHTML='<p style="color:var(--muted);font-size:0.88rem;">Aucune chambre disponible pour ces dates.</p>'; return; } rooms.forEach((room,idx)=>{ const rate=room.rates?.[0]; const price=rate?parseFloat(rate.net||rate.sellingRate||0).toFixed(2):'—'; const currency=STATE.selectedHotel.currency||'EUR'; const nights=Math.round((new Date(STATE.searchParams.checkOut)-new Date(STATE.searchParams.checkIn))/86400000); const board=formatBoard(rate?.boardCode); const canCancel=rate?.cancellationPolicies?.length>0; const div=document.createElement('div'); div.className='room-card'; div.dataset.roomIdx=idx; div.innerHTML=`<div class="room-card-top"><div><div class="room-name">${room.name||room.code||'Chambre standard'}</div><div class="room-board">${board}</div><div class="room-cancellation ${canCancel?'free':'non-refund'}">${canCancel?'✓ Annulation gratuite possible':'✗ Non remboursable'}</div></div><div class="room-price-box"><div class="room-price">${price} ${currency}</div><div class="room-price-nights">pour ${nights} nuit${nights>1?'s':''}</div><button class="btn-room-select" onclick="selectRoom(${idx})" id="roomBtn${idx}">Choisir</button></div></div>`; list.appendChild(div); }); }
+async function selectRoom(idx){ const room=STATE.selectedHotel.rooms?.[idx]; const rate=room?.rates?.[0]; if(!room||!rate) return; STATE.selectedRoom={room,rate,idx}; document.querySelectorAll('.room-card').forEach(c=>{ c.classList.remove('selected'); c.querySelector('.btn-room-select')?.classList.remove('selected-btn'); if(c.querySelector('.btn-room-select')) c.querySelector('.btn-room-select').textContent='Choisir'; }); const card=document.querySelector(`.room-card[data-room-idx="${idx}"]`); card.classList.add('selected'); card.querySelector('.btn-room-select').classList.add('selected-btn'); card.querySelector('.btn-room-select').textContent='✓ Sélectionné'; document.getElementById('guestForm').style.display='block'; await doCheckrate(rate.rateKey); }
+async function doCheckrate(rateKey){ const bookBtn=document.getElementById('bookBtn'); bookBtn.style.display='flex'; bookBtn.disabled=true; document.getElementById('bookBtnText').textContent='Vérification du tarif…'; document.getElementById('bookSpinner').style.display='block'; try{ const resp=await fetch('/hotels/checkrate/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({rate_key:rateKey})}); const data=await resp.json(); document.getElementById('bookSpinner').style.display='none'; if(!resp.ok){ showBookingAlert(data.error||'Erreur de vérification du tarif.'); bookBtn.disabled=true; document.getElementById('bookBtnText').textContent='Confirmer la réservation'; return; } STATE.checkrateData=data; buildSummaryFull(data); const cancelPolicy=data.cancellation_policies?.[0]; if(cancelPolicy){ document.getElementById('cancellationPolicy').style.display='block'; document.getElementById('cancellationText').textContent=cancelPolicy.amount>0?`Frais d'annulation de ${cancelPolicy.amount} ${data.currency||'EUR'} à partir du ${formatDate(cancelPolicy.from)}.`:`Annulation gratuite jusqu'au ${formatDate(cancelPolicy.from)}.`; } bookBtn.disabled=false; document.getElementById('bookBtnText').textContent='Confirmer la réservation'; }catch(err){ document.getElementById('bookSpinner').style.display='none'; showBookingAlert('Erreur de connexion lors de la vérification du tarif.'); bookBtn.disabled=true; document.getElementById('bookBtnText').textContent='Confirmer la réservation'; } }
+function buildSummaryBase(){ const hotel=STATE.selectedHotel; const params=STATE.searchParams; const nights=Math.round((new Date(params.checkOut)-new Date(params.checkIn))/86400000); document.getElementById('summaryContent').innerHTML=`<div class="summary-row"><span class="summary-label">🏨 Hôtel</span><span class="summary-val">${hotel.name}</span></div><div class="summary-row"><span class="summary-label">📅 Arrivée</span><span class="summary-val">${formatDate(params.checkIn)}</span></div><div class="summary-row"><span class="summary-label">📅 Départ</span><span class="summary-val">${formatDate(params.checkOut)}</span></div><div class="summary-row"><span class="summary-label">🌙 Nuits</span><span class="summary-val">${nights}</span></div><div class="summary-row"><span class="summary-label">👥 Adultes</span><span class="summary-val">${params.adults}</span></div><div class="summary-row"><span class="summary-label">🛏 Chambre</span><span class="summary-val">En cours de sélection…</span></div>`; document.getElementById('summaryTotal').textContent='—'; }
+function buildSummaryFull(checkrateData){ const hotel=STATE.selectedHotel; const params=STATE.searchParams; const room=STATE.selectedRoom; const nights=Math.round((new Date(params.checkOut)-new Date(params.checkIn))/86400000); const price=parseFloat(checkrateData.net||checkrateData.selling_rate||0).toFixed(2); const currency=checkrateData.currency||'EUR'; document.getElementById('summaryContent').innerHTML=`<div class="summary-row"><span class="summary-label">🏨 Hôtel</span><span class="summary-val">${hotel.name}</span></div><div class="summary-row"><span class="summary-label">🛏 Chambre</span><span class="summary-val">${room.room.name||'Chambre standard'}</span></div><div class="summary-row"><span class="summary-label">🍽 Formule</span><span class="summary-val">${formatBoard(room.rate.boardCode)}</span></div><div class="summary-row"><span class="summary-label">📅 Arrivée</span><span class="summary-val">${formatDate(params.checkIn)}</span></div><div class="summary-row"><span class="summary-label">📅 Départ</span><span class="summary-val">${formatDate(params.checkOut)}</span></div><div class="summary-row"><span class="summary-label">🌙 Nuits</span><span class="summary-val">${nights}</span></div><div class="summary-row"><span class="summary-label">👥 Adultes</span><span class="summary-val">${params.adults}</span></div>`; document.getElementById('summaryTotal').textContent=`${price} ${currency}`; STATE.finalTotal=price; STATE.finalCurrency=currency; }
+async function submitBooking(){ const firstName=document.getElementById('guestFirstName').value.trim(); const lastName=document.getElementById('guestLastName').value.trim(); const email=document.getElementById('guestEmail').value.trim(); const phone=document.getElementById('guestPhone').value.trim(); const title=document.getElementById('guestTitle').value; const nationality=document.getElementById('guestNationality').value; const specialReq=document.getElementById('guestSpecialRequests').value.trim(); if(!firstName||!lastName||!email||!phone){ showBookingAlert('Veuillez remplir tous les champs obligatoires (*).'); return; } if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showBookingAlert('Adresse email invalide.'); return; } if(!STATE.checkrateData){ showBookingAlert("Veuillez d'abord sélectionner une chambre."); return; } const btn=document.getElementById('bookBtn'); btn.disabled=true; document.getElementById('bookBtnText').textContent='Réservation en cours…'; document.getElementById('bookSpinner').style.display='block'; document.getElementById('bookingAlert').classList.remove('visible'); const payload={rate_key:STATE.selectedRoom.rate.rateKey,hotel_code:STATE.selectedHotel.code,hotel_name:STATE.selectedHotel.name,check_in:STATE.searchParams.checkIn,check_out:STATE.searchParams.checkOut,adults:parseInt(STATE.searchParams.adults),rooms:parseInt(STATE.searchParams.rooms),title,first_name:firstName,last_name:lastName,email,phone,nationality,special_requests:specialReq,net_price:STATE.finalTotal,currency:STATE.finalCurrency}; try{ const resp=await fetch('/hotels/book/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify(payload)}); const data=await resp.json(); document.getElementById('bookSpinner').style.display='none'; if(!resp.ok){ showBookingAlert(data.error||'Réservation non finalisée. Notre équipe vous contacte.'); btn.disabled=false; document.getElementById('bookBtnText').textContent='Confirmer la réservation'; return; } showConfirmation(data,firstName,lastName,email); }catch(err){ document.getElementById('bookSpinner').style.display='none'; showBookingAlert('Erreur de connexion.'); btn.disabled=false; document.getElementById('bookBtnText').textContent='Confirmer la réservation'; } }
+function showConfirmation(data,firstName,lastName,email){ hideAll(); const panel=document.getElementById('confirmationPanel'); panel.classList.add('visible'); document.getElementById('confirmRef').textContent=`Référence : ${data.booking_reference||data.reference||'—'}`; const hotel=STATE.selectedHotel; const params=STATE.searchParams; const nights=Math.round((new Date(params.checkOut)-new Date(params.checkIn))/86400000); document.getElementById('confirmDetails').innerHTML=`<div class="confirm-item"><label>Client</label><span>${firstName} ${lastName}</span></div><div class="confirm-item"><label>Email</label><span>${email}</span></div><div class="confirm-item"><label>Hôtel</label><span>${hotel.name}</span></div><div class="confirm-item"><label>Chambre</label><span>${STATE.selectedRoom.room.name||'Standard'}</span></div><div class="confirm-item"><label>Arrivée</label><span>${formatDate(params.checkIn)}</span></div><div class="confirm-item"><label>Départ</label><span>${formatDate(params.checkOut)}</span></div><div class="confirm-item"><label>Nuits</label><span>${nights}</span></div><div class="confirm-item"><label>Montant total</label><span>${STATE.finalTotal} ${STATE.finalCurrency}</span></div>`; panel.scrollIntoView({behavior:'smooth'}); }
+function cancelBooking(){ document.getElementById('bookingPanel').classList.remove('visible'); document.getElementById('resultsSection').classList.add('visible'); document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'}); }
+function hideAll(){ ['resultsSection','bookingPanel','confirmationPanel','loadingState'].forEach(id=>{ document.getElementById(id).classList.remove('visible'); }); const err=document.getElementById('searchError'); err.classList.remove('visible'); err.style.display='none'; }
+function showError(msg){ const el=document.getElementById('searchError'); el.textContent=msg; el.classList.add('visible'); el.style.display='block'; el.scrollIntoView({behavior:'smooth'}); }
+function showBookingAlert(msg){ const el=document.getElementById('bookingAlert'); el.textContent=msg; el.classList.add('visible'); el.style.display='block'; }
+function formatDate(dateStr){ if(!dateStr) return '—'; return new Date(dateStr+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}); }
+function formatBoard(code){ const boards={RO:'Chambre seule',BB:'Petit-déjeuner inclus',HB:'Demi-pension',FB:'Pension complète',AI:'Tout inclus',CB:'Petit-déjeuner continental'}; return boards[code]||code||'—'; }
+function getCookie(name){ const v=document.cookie.match('(^|;) ?'+name+'=([^;]*)(;|$)'); return v?v[2]:''; }
+document.getElementById('hamburger').addEventListener('click',function(){ this.classList.toggle('open'); document.getElementById('mobileMenu').classList.toggle('open'); });
+const revealEls=document.querySelectorAll('.reveal');
+const observer=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }); },{threshold:0.1});
+revealEls.forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
